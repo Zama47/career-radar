@@ -25,27 +25,58 @@ web (Next.js) ──public API──▶ core-api (Spring Boot) ──▶ Postgre
 
 1. **Read path (web):** browser → Next.js server component → `lib/api.ts` →
    `core-api /api/v1/*` → PostgreSQL → JSON.
-2. **Ingestion path (collector):** source adapter `fetch()` → `normalize()` →
-   `VacancyDraft` list → `core-api /internal/v1/vacancies:upsert` with
-   `X-Internal-Token` → validate → deduplicate → persist. The collector never opens a
-   database connection.
+2. **Ingestion path (collector):** company adapter `fetch(query)` checks `robots.txt` for
+   the origin, sends at most one request per second per host, obtains raw listings (JSON or
+   SSR HTML) → `normalize()` → `VacancyDraft` list → `core-api
+   /internal/v1/vacancies:upsert` in chunks of 50 with `X-Internal-Token` → validate →
+   deduplicate → persist. The collector classifies seniority, work format and profession
+   from the listing text (rule-based, deterministic) and lets core-api own deduplication and
+   storage. The collector never opens a database connection and never bypasses a
+   403/captcha: it stops and reports the source as failed.
 3. **LLM path (later):** core-api builds a prompt from stored data → OpenAI-compatible
    provider (OpenCode Go) → structured JSON validated by Bean Validation → `llm_runs`
    audit row. Web only receives the result through the public API.
+
+## Company source adapters
+
+```text
+career site ──HTTP (robots.txt, ≤1 rps)──▶ adapter.fetch() ──▶ RawVacancy
+                                                       │
+                                              adapter.normalize()
+                                                       ▼
+                                                  VacancyDraft ──▶ core-api
+```
+
+| Source | Transport | Pagination | Notes |
+|---|---|---|---|
+| `MTS` | JSON `/api/v2/vacancies` | `pagination[page]` | API returns 25 items/page and shuffles order; deduplicate by `id` |
+| `YANDEX` | JSON `/jobs/api/jobs/publications/` | `next` cursor | public endpoint used by the site; no auth |
+| `VK` | SSR HTML `/vacancy/` | first page only | `/load_more/` is disallowed by `robots.txt`; do not imitate it |
+
+Rules every adapter follows:
+
+- read `robots.txt` once per origin and stop if the path is disallowed;
+- use `COLLECTOR_USER_AGENT`, never impersonate a browser;
+- retry only `429`/`5xx`, honour `Retry-After`, and never retry a `403`/captcha;
+- keep `raw_json` for debugging but never log titles, descriptions, tokens or emails;
+- add a fixture + offline test for every new adapter.
 
 ## Configuration
 
 All configuration comes from environment variables (see `infra/.env.example`):
 `POSTGRES_*`, `CORE_API_PORT`, `INTERNAL_TOKEN`, `OPENCODE_GO_BASE_URL`,
-`OPENCODE_GO_API_KEY`, `HH_USER_AGENT`. The collector also reads `CORE_API_URL`,
-`COLLECTOR_HTTP_TIMEOUT`, `NEXT_PUBLIC_API_URL` (web).
+`OPENCODE_GO_API_KEY`, `COLLECTOR_USER_AGENT`. The collector also reads `CORE_API_URL`,
+`MTS_BASE_URL`, `YANDEX_BASE_URL`, `VK_BASE_URL`, `REQUEST_TIMEOUT`,
+`RATE_LIMIT_SECONDS`; the legacy hh.ru adapter additionally reads `HH_BASE_URL`,
+`HH_AREA`, `HH_PER_PAGE`, `HH_ACCESS_TOKEN` (optional). Web reads `NEXT_PUBLIC_API_URL`.
 
 ## Data and migrations
 
 - Schema changes only through Flyway migrations in
   `core-api/src/main/resources/db/migration`. `V1__baseline.sql` establishes the
   history table; `V2__core_domain.sql` adds business tables; `V3__seed_dictionaries.sql`
-  seeds professions, skills and sources.
+  seeds professions, skills and pilot sources; `V4__source_catalog.sql` adds the company
+  career-site dictionary used by stage 2.
 - Hibernate runs with `ddl-auto: validate`: entities must match migrations, never
   create tables at runtime.
 - Deduplication keys and normalization rules are owned by core-api, so all sources

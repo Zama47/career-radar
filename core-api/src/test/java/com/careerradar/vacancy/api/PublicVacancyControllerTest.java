@@ -124,7 +124,8 @@ class PublicVacancyControllerTest extends AbstractIntegrationTest {
 
         org.assertj.core.api.Assertions.assertThat(professions).isEqualTo(10);
         org.assertj.core.api.Assertions.assertThat(skills).isEqualTo(25);
-        org.assertj.core.api.Assertions.assertThat(sources).isEqualTo(7);
+        // 7 rows from V3 (HH, OTHER and five pilot sites) + 36 new company sites in V4.
+        org.assertj.core.api.Assertions.assertThat(sources).isEqualTo(43);
     }
 
     private static VacancyDraftRequest draft(

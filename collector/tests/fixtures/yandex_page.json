@@ -1,0 +1,249 @@
+{
+  "count": 278,
+  "next": "/jobs/api/jobs/publications/?page_size=40&cursor=cD0wJnQ9MjAyNi0xMS0wMiZpPTQ5NTExJnI9MA",
+  "results": [
+    {
+      "id": 15322,
+      "publication_slug_url": "multitrack-_-noviy-format-nayma-dlya-opitnih-bekenderov-15322",
+      "status": "published",
+      "vacancy": {
+        "id": 394841,
+        "cities": [
+          {
+            "id": 1,
+            "slug": "moscow",
+            "name": "Москва"
+          },
+          {
+            "id": 2,
+            "slug": "saint-petersburg",
+            "name": "Санкт-Петербург"
+          }
+        ],
+        "skills": [
+          {
+            "id": 34,
+            "name": "Python"
+          },
+          {
+            "id": 62,
+            "name": "C++"
+          },
+          {
+            "id": 64,
+            "name": "Java"
+          },
+          {
+            "id": 74,
+            "name": "Go"
+          }
+        ],
+        "work_modes": [
+          {
+            "id": 3,
+            "slug": "mixed",
+            "name": "Гибридный"
+          }
+        ]
+      },
+      "public_service": {
+        "id": 98,
+        "icon": "https://jobs.s3.yandex.net/public_services/ya.svg_bc201ebdf8654e4082e1e2b446684d0c",
+        "slug": "yandex",
+        "is_active": true,
+        "name": "Общие сервисы Яндекса",
+        "description": "Здесь размещаются все вакансии Яндекса без категоризации",
+        "group": null
+      },
+      "is_chief": false,
+      "fast_track": {
+        "id": 368,
+        "name": "Weekend Offer Multitrack 14-15 марта",
+        "description": "Вакансия участвует в серии быстрых наймовых мероприятий. Регистрируйтесь, пройдите все этапы собеседований и получите офер за 2 дня.",
+        "url": "https://yandex.ru/project/events/wo-multitrack-backend-0326?utm_source=career_portal_vac&utm_medium=banner&utm_campaign=wo_multitrack_0326",
+        "date": "2026-03-06",
+        "start_date": "2026-03-14T07:00:00.000000Z",
+        "end_date": "2026-03-15T16:00:00.000000Z",
+        "form_id": "13808599.4a71bc120937eae12447a1bd97788d7fb421a169",
+        "is_fast_track_expired": true
+      },
+      "redirect_url": null,
+      "version": 0,
+      "lang": "ru",
+      "title": "MultiTrack — новый формат найма для опытных бэкендеров",
+      "short_summary": "В течение 2–3 месяцев вы сможете поработать в трёх командах Яндекса и выбрать ту, в которой захотите остаться. Ждём опытных разработчиков на Java, Python, Go или C++.",
+      "modified": "2026-10-19T09:01:25.635592Z"
+    },
+    {
+      "id": 49577,
+      "publication_slug_url": "sekretar-resepshena-49577",
+      "status": "published",
+      "vacancy": {
+        "id": 903291,
+        "cities": [],
+        "skills": [],
+        "work_modes": []
+      },
+      "public_service": {
+        "id": 94,
+        "icon": "https://jobs.s3.yandex.net/public_services/ads.svg_5634e000f7f14226b2f4ec540d252ae4",
+        "slug": "comdep",
+        "is_active": true,
+        "name": "Коммерческий департамент",
+        "description": "&nbsp;",
+        "group": {
+          "id": 2,
+          "name": "Поисковые сервисы и ИИ",
+          "slug": "search"
+        }
+      },
+      "is_chief": false,
+      "fast_track": null,
+      "redirect_url": "https://komanda.yandex.ru/moscow/back_office/sekretar_resepshena?utm_source=redirect_job&utm_medium=web&utm_campaign=redirect_job",
+      "version": 1,
+      "lang": "ru",
+      "title": "Секретарь ресепшена",
+      "short_summary": "Яндекс приглашает секретаря ресепшена для работы в офисах Москвы («Аврора», «Красная Роза»). Твоя задача — обеспечивать бесперебойную работу передней линии: проверка корреспонденции, работа с запросами в трекере, поддержка сотрудников и гостей. Мы ищем ответственного специалиста с опытом, навыками ПК (Excel, Office) и отличными коммуникативными способностями. Предлагаем зарплату от 62 000 до 77 500 ₽, официальное оформление с первого дня и возможности карьерного роста в крупной IT-компании. Стань тем, кто делает рабочий день коллег комфортнее!",
+      "modified": "2026-11-06T14:47:16.812296Z"
+    },
+    {
+      "id": 49575,
+      "publication_slug_url": "starshiy-devopsinzhener-49575",
+      "status": "published",
+      "vacancy": {
+        "id": 1055247,
+        "cities": [
+          {
+            "id": 1,
+            "slug": "moscow",
+            "name": "Москва"
+          },
+          {
+            "id": 2,
+            "slug": "saint-petersburg",
+            "name": "Санкт-Петербург"
+          }
+        ],
+        "skills": [
+          {
+            "id": 34,
+            "name": "Python"
+          },
+          {
+            "id": 74,
+            "name": "Go"
+          }
+        ],
+        "work_modes": [
+          {
+            "id": 2,
+            "slug": "office",
+            "name": "Офис"
+          },
+          {
+            "id": 3,
+            "slug": "mixed",
+            "name": "Гибридный"
+          }
+        ]
+      },
+      "public_service": {
+        "id": 95,
+        "icon": "https://jobs.s3.yandex.net/public_services/infra.svg_f4f0b25cee9945c9b229d33046617eda",
+        "slug": "infrastructure",
+        "is_active": true,
+        "name": "Yandex Infrastructure",
+        "description": "Создаём системы и инструменты, на которых работают сервисы Яндекса",
+        "group": {
+          "id": 3,
+          "name": "Yandex Infrastructure",
+          "slug": "infrastructure"
+        }
+      },
+      "is_chief": false,
+      "fast_track": null,
+      "redirect_url": null,
+      "version": 5,
+      "lang": "ru",
+      "title": "Старший DevOps-инженер",
+      "short_summary": "Яндекс — это огромный объём информации и сетевого трафика, множество паттернов работы с данными. Мы ищем DevOps-инженера в команду единого хранилища данных Яндекса. Приходите, если готовы обеспечивать надёжность и доступность сервиса для пользователей. Ждём, что вы знаете Python, Go или С++.",
+      "modified": "2026-11-06T14:43:37.208159Z"
+    },
+    {
+      "id": 49574,
+      "publication_slug_url": "spetsialist-po-analizu-effektivnosti-partnyorov-49574",
+      "status": "published",
+      "vacancy": {
+        "id": 392836,
+        "cities": [],
+        "skills": [],
+        "work_modes": [
+          {
+            "id": 1,
+            "slug": "remote",
+            "name": "Удалённый"
+          }
+        ]
+      },
+      "public_service": {
+        "id": 51,
+        "icon": "https://jobs.s3.yandex.net/public_services/eda.svg_3fc7c324468945f59587886290aa3d35",
+        "slug": "eda",
+        "is_active": true,
+        "name": "Яндекс Еда",
+        "description": "Быстрая доставка еды",
+        "group": {
+          "id": 4,
+          "name": "Городские сервисы",
+          "slug": "ecomm+ridetech"
+        }
+      },
+      "is_chief": false,
+      "fast_track": null,
+      "redirect_url": "https://komanda.yandex.ru/remote/sales/spetsialist_po_analizu_effektivnosti_partnyorov?utm_source=redirect_job&utm_medium=web&utm_campaign=redirect_job",
+      "version": 1,
+      "lang": "ru",
+      "title": "Специалист по анализу эффективности партнёров",
+      "short_summary": "Наша команда постоянно развивается, и сейчас мы ищем коллегу, который поможет нашим партнёрам расти и становиться эффективнее. Предлагаем полностью удалённый формат, белую зарплату от 45 000 до 54 000 ₽. Ты будешь анализировать показатели партнёров, готовить отчёты и помогать улучшать сотрудничество. А ещё — учиться у экспертов Яндекса и получать опыт в международной IT-компании. Присоединяйся к команде Яндекса!",
+      "modified": "2026-11-06T14:12:30.254477Z"
+    },
+    {
+      "id": 49568,
+      "publication_slug_url": "glavniy-kolichestvenniy-issledovatel-49568",
+      "status": "published",
+      "vacancy": {
+        "id": 823127,
+        "cities": [],
+        "skills": [],
+        "work_modes": [
+          {
+            "id": 1,
+            "slug": "remote",
+            "name": "Удалённый"
+          }
+        ]
+      },
+      "public_service": {
+        "id": 211,
+        "icon": "https://jobs.s3.yandex.net/public_services/сложныи.svg_8e35d927ba594457a93c54e6882ccf61",
+        "slug": "crowd",
+        "is_active": true,
+        "name": "Yandex Crowd",
+        "description": "Crowd помогает сервисам Яндекса решать бизнес-задачи: мы размечаем данные, занимаемся тестированием, поддержкой пользователей и продажами, модерируем контент",
+        "group": {
+          "id": 2,
+          "name": "Поисковые сервисы и ИИ",
+          "slug": "search"
+        }
+      },
+      "is_chief": false,
+      "fast_track": null,
+      "redirect_url": "https://crowd.yandex.ru/back_office/glav_kol_issled",
+      "version": 1,
+      "lang": "ru",
+      "title": "Главный количественный исследователь",
+      "short_summary": "Влияйте на развитие популярных продуктов, собирайте и изучайте данные, которые помогают принимать бизнес-решения. Только из дома.",
+      "modified": "2026-11-06T10:40:17.075765Z"
+    }
+  ]
+}

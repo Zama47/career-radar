@@ -28,7 +28,7 @@ class FakeHhSource:
                 external_id="1",
                 url="https://hh.ru/vacancy/1",
                 title="Android-разработчик (стажер)",
-                company="Ромашка",
+                company="МТС",
                 location="Москва",
                 raw_json={"id": "1", "name": "Android-разработчик (стажер)"},
             )
@@ -95,9 +95,9 @@ def test_parser_requires_query_for_hh() -> None:
         build_parser().parse_args(["hh"])
 
 
-def test_sources_command_lists_hh(capsys: pytest.CaptureFixture[str]) -> None:
+def test_sources_command_lists_company_career_sites(capsys: pytest.CaptureFixture[str]) -> None:
     assert main(["sources"]) == 0
-    assert capsys.readouterr().out.strip() == "HH"
+    assert capsys.readouterr().out.strip().splitlines() == ["MTS", "VK", "YANDEX"]
 
 
 def test_dry_run_does_not_call_core(
@@ -120,16 +120,7 @@ def test_output_writes_raw_fixture(monkeypatch: pytest.MonkeyPatch, tmp_path: Pa
     monkeypatch.setattr("collector.__main__.CoreClient", ExplodingCoreClient)
     output = tmp_path / "hh_page.json"
 
-    args = [
-        "hh",
-        "--query",
-        "android стажер",
-        "--pages",
-        "2",
-        "--dry-run",
-        "--output",
-        str(output),
-    ]
+    args = ["hh", "--query", "android стажер", "--pages", "2", "--dry-run", "--output", str(output)]
 
     assert main(args) == 0
 

@@ -1,0 +1,462 @@
+{
+  "data": [
+    {
+      "id": 696751070893834400,
+      "documentId": "legacy-696751070893834313",
+      "title": "Начинающий специалист банка г. Уфа",
+      "slug": "696751070893834313",
+      "isActive": true,
+      "createdAt": "2026-11-07T00:00:00.000Z",
+      "updatedAt": "2026-11-07T00:00:00.000Z",
+      "publishedAt": "2026-11-07T00:00:00.000Z",
+      "salaryFrom": null,
+      "salaryTo": null,
+      "description": null,
+      "mtsId": "696751070893834313",
+      "image": null,
+      "categories": [
+        {
+          "id": null,
+          "documentId": "category-Финансы",
+          "title": "Финансы",
+          "slug": "финансы",
+          "createdAt": "2026-11-07T18:39:10.333Z",
+          "updatedAt": "2026-11-07T18:39:10.333Z",
+          "publishedAt": "2026-11-07T18:39:10.333Z",
+          "icon": null,
+          "image": null,
+          "subCategories": [],
+          "parentCategory": null
+        }
+      ],
+      "currency": {
+        "id": 1,
+        "documentId": "ja2zb8jti7wg1pqd7jrk8t1f",
+        "title": "RUB",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z"
+      },
+      "region": {
+        "id": null,
+        "documentId": "region-Уфа",
+        "title": "Уфа",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z",
+        "addresses": []
+      },
+      "address": null,
+      "experience": {
+        "id": 21,
+        "documentId": "3056986b26fb6605",
+        "title": "Без опыта",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z"
+      },
+      "FeedSettings": null,
+      "organization": {
+        "id": null,
+        "documentId": "org-ПАО МТС-Банк",
+        "title": "ПАО МТС-Банк",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z"
+      },
+      "workFormats": [
+        {
+          "id": 1,
+          "documentId": "worktype-1",
+          "title": "В офисе",
+          "createdAt": "2026-11-07T18:39:10.333Z",
+          "updatedAt": "2026-11-07T18:39:10.333Z",
+          "publishedAt": "2026-11-07T18:39:10.333Z"
+        }
+      ],
+      "workTypes": [],
+      "workSchedules": [
+        {
+          "id": 0,
+          "documentId": "schedule-0",
+          "title": "Полный день",
+          "createdAt": "2026-11-07T18:39:10.333Z",
+          "updatedAt": "2026-11-07T18:39:10.333Z",
+          "publishedAt": "2026-11-07T18:39:10.333Z"
+        }
+      ],
+      "tasks": [],
+      "offers": [],
+      "requirements": [],
+      "tags": []
+    },
+    {
+      "id": 722812798668636300,
+      "documentId": "legacy-722812798668636256",
+      "title": "Разработчик интеграционных решений (Java)",
+      "slug": "722812798668636256",
+      "isActive": true,
+      "createdAt": "2026-11-07T00:00:00.000Z",
+      "updatedAt": "2026-11-07T00:00:00.000Z",
+      "publishedAt": "2026-11-07T00:00:00.000Z",
+      "salaryFrom": null,
+      "salaryTo": null,
+      "description": null,
+      "mtsId": "722812798668636256",
+      "image": null,
+      "categories": [
+        {
+          "id": null,
+          "documentId": "category-Работа в IT",
+          "title": "Работа в IT",
+          "slug": "работа-в-it",
+          "createdAt": "2026-11-07T18:39:10.333Z",
+          "updatedAt": "2026-11-07T18:39:10.333Z",
+          "publishedAt": "2026-11-07T18:39:10.333Z",
+          "icon": null,
+          "image": null,
+          "subCategories": [],
+          "parentCategory": null
+        }
+      ],
+      "currency": {
+        "id": 1,
+        "documentId": "ja2zb8jti7wg1pqd7jrk8t1f",
+        "title": "RUB",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z"
+      },
+      "region": {
+        "id": null,
+        "documentId": "region-Москва",
+        "title": "Москва",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z",
+        "addresses": []
+      },
+      "address": null,
+      "experience": {
+        "id": 22,
+        "documentId": "02d88bc9ca993232",
+        "title": "3-6 лет",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z"
+      },
+      "FeedSettings": null,
+      "organization": {
+        "id": null,
+        "documentId": "org-ПАО МТС-Банк",
+        "title": "ПАО МТС-Банк",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z"
+      },
+      "workFormats": [
+        {
+          "id": 1,
+          "documentId": "worktype-1",
+          "title": "В офисе",
+          "createdAt": "2026-11-07T18:39:10.333Z",
+          "updatedAt": "2026-11-07T18:39:10.333Z",
+          "publishedAt": "2026-11-07T18:39:10.333Z"
+        }
+      ],
+      "workTypes": [],
+      "workSchedules": [
+        {
+          "id": 0,
+          "documentId": "schedule-0",
+          "title": "Полный день",
+          "createdAt": "2026-11-07T18:39:10.333Z",
+          "updatedAt": "2026-11-07T18:39:10.333Z",
+          "publishedAt": "2026-11-07T18:39:10.333Z"
+        }
+      ],
+      "tasks": [],
+      "offers": [],
+      "requirements": [],
+      "tags": []
+    },
+    {
+      "id": 719596607993020500,
+      "documentId": "legacy-719596607993020507",
+      "title": "Инженер технической поддержки-стажер",
+      "slug": "719596607993020507",
+      "isActive": true,
+      "createdAt": "2026-11-07T00:00:00.000Z",
+      "updatedAt": "2026-11-07T00:00:00.000Z",
+      "publishedAt": "2026-11-07T00:00:00.000Z",
+      "salaryFrom": null,
+      "salaryTo": null,
+      "description": null,
+      "mtsId": "719596607993020507",
+      "image": null,
+      "categories": [
+        {
+          "id": null,
+          "documentId": "category-Работа в IT",
+          "title": "Работа в IT",
+          "slug": "работа-в-it",
+          "createdAt": "2026-11-07T18:39:10.333Z",
+          "updatedAt": "2026-11-07T18:39:10.333Z",
+          "publishedAt": "2026-11-07T18:39:10.333Z",
+          "icon": null,
+          "image": null,
+          "subCategories": [],
+          "parentCategory": null
+        }
+      ],
+      "currency": {
+        "id": 1,
+        "documentId": "ja2zb8jti7wg1pqd7jrk8t1f",
+        "title": "RUB",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z"
+      },
+      "region": {
+        "id": null,
+        "documentId": "region-Москва",
+        "title": "Москва",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z",
+        "addresses": []
+      },
+      "address": null,
+      "experience": {
+        "id": 21,
+        "documentId": "3056986b26fb6605",
+        "title": "Без опыта",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z"
+      },
+      "FeedSettings": null,
+      "organization": {
+        "id": null,
+        "documentId": "org-ПАО МТС-Банк",
+        "title": "ПАО МТС-Банк",
+        "createdAt": "2026-11-07T18:39:10.333Z",
+        "updatedAt": "2026-11-07T18:39:10.333Z",
+        "publishedAt": "2026-11-07T18:39:10.333Z"
+      },
+      "workFormats": [
+        {
+          "id": 1,
+          "documentId": "worktype-1",
+          "title": "В офисе",
+          "createdAt": "2026-11-07T18:39:10.333Z",
+          "updatedAt": "2026-11-07T18:39:10.333Z",
+          "publishedAt": "2026-11-07T18:39:10.333Z"
+        }
+      ],
+      "workTypes": [],
+      "workSchedules": [
+        {
+          "id": 0,
+          "documentId": "schedule-0",
+          "title": "Полный день",
+          "createdAt": "2026-11-07T18:39:10.333Z",
+          "updatedAt": "2026-11-07T18:39:10.333Z",
+          "publishedAt": "2026-11-07T18:39:10.333Z"
+        }
+      ],
+      "tasks": [],
+      "offers": [],
+      "requirements": [],
+      "tags": []
+    },
+    {
+      "id": 719838218106699900,
+      "documentId": "legacy-719838218106699879",
+      "title": "Ведущий разработчик Java",
+      "slug": "719838218106699879",
+      "isActive": true,
+      "createdAt": "2026-11-07T00:00:00.000Z",
+      "updatedAt": "2026-11-07T00:00:00.000Z",
+      "publishedAt": "2026-11-07T00:00:00.000Z",
+      "salaryFrom": null,
+      "salaryTo": null,
+      "description": null,
+      "mtsId": "719838218106699879",
+      "image": null,
+      "categories": [
+        {
+          "id": null,
+          "documentId": "category-Работа в IT",
+          "title": "Работа в IT",
+          "slug": "работа-в-it",
+          "createdAt": "2026-11-07T18:39:10.334Z",
+          "updatedAt": "2026-11-07T18:39:10.334Z",
+          "publishedAt": "2026-11-07T18:39:10.334Z",
+          "icon": null,
+          "image": null,
+          "subCategories": [],
+          "parentCategory": null
+        }
+      ],
+      "currency": {
+        "id": 1,
+        "documentId": "ja2zb8jti7wg1pqd7jrk8t1f",
+        "title": "RUB",
+        "createdAt": "2026-11-07T18:39:10.334Z",
+        "updatedAt": "2026-11-07T18:39:10.334Z",
+        "publishedAt": "2026-11-07T18:39:10.334Z"
+      },
+      "region": {
+        "id": null,
+        "documentId": "region-Москва",
+        "title": "Москва",
+        "createdAt": "2026-11-07T18:39:10.334Z",
+        "updatedAt": "2026-11-07T18:39:10.334Z",
+        "publishedAt": "2026-11-07T18:39:10.334Z",
+        "addresses": []
+      },
+      "address": null,
+      "experience": {
+        "id": 20,
+        "documentId": "7c10845b3bcabd9f",
+        "title": "1-3 года",
+        "createdAt": "2026-11-07T18:39:10.334Z",
+        "updatedAt": "2026-11-07T18:39:10.334Z",
+        "publishedAt": "2026-11-07T18:39:10.334Z"
+      },
+      "FeedSettings": null,
+      "organization": {
+        "id": null,
+        "documentId": "org-ПАО МТС-Банк",
+        "title": "ПАО МТС-Банк",
+        "createdAt": "2026-11-07T18:39:10.334Z",
+        "updatedAt": "2026-11-07T18:39:10.334Z",
+        "publishedAt": "2026-11-07T18:39:10.334Z"
+      },
+      "workFormats": [
+        {
+          "id": 1,
+          "documentId": "worktype-1",
+          "title": "В офисе",
+          "createdAt": "2026-11-07T18:39:10.334Z",
+          "updatedAt": "2026-11-07T18:39:10.334Z",
+          "publishedAt": "2026-11-07T18:39:10.334Z"
+        }
+      ],
+      "workTypes": [],
+      "workSchedules": [
+        {
+          "id": 0,
+          "documentId": "schedule-0",
+          "title": "Полный день",
+          "createdAt": "2026-11-07T18:39:10.334Z",
+          "updatedAt": "2026-11-07T18:39:10.334Z",
+          "publishedAt": "2026-11-07T18:39:10.334Z"
+        }
+      ],
+      "tasks": [],
+      "offers": [],
+      "requirements": [],
+      "tags": []
+    },
+    {
+      "id": 722359826952224900,
+      "documentId": "legacy-722359826952224873",
+      "title": "Директор дирекции аналитического сопровождения",
+      "slug": "722359826952224873",
+      "isActive": true,
+      "createdAt": "2026-11-07T00:00:00.000Z",
+      "updatedAt": "2026-11-07T00:00:00.000Z",
+      "publishedAt": "2026-11-07T00:00:00.000Z",
+      "salaryFrom": null,
+      "salaryTo": null,
+      "description": null,
+      "mtsId": "722359826952224873",
+      "image": null,
+      "categories": [
+        {
+          "id": null,
+          "documentId": "category-Финансы",
+          "title": "Финансы",
+          "slug": "финансы",
+          "createdAt": "2026-11-07T18:39:10.334Z",
+          "updatedAt": "2026-11-07T18:39:10.334Z",
+          "publishedAt": "2026-11-07T18:39:10.334Z",
+          "icon": null,
+          "image": null,
+          "subCategories": [],
+          "parentCategory": null
+        }
+      ],
+      "currency": {
+        "id": 1,
+        "documentId": "ja2zb8jti7wg1pqd7jrk8t1f",
+        "title": "RUB",
+        "createdAt": "2026-11-07T18:39:10.334Z",
+        "updatedAt": "2026-11-07T18:39:10.334Z",
+        "publishedAt": "2026-11-07T18:39:10.334Z"
+      },
+      "region": {
+        "id": null,
+        "documentId": "region-Москва",
+        "title": "Москва",
+        "createdAt": "2026-11-07T18:39:10.334Z",
+        "updatedAt": "2026-11-07T18:39:10.334Z",
+        "publishedAt": "2026-11-07T18:39:10.334Z",
+        "addresses": []
+      },
+      "address": null,
+      "experience": {
+        "id": 19,
+        "documentId": "27a50ac00e382179",
+        "title": "Более 6 лет",
+        "createdAt": "2026-11-07T18:39:10.334Z",
+        "updatedAt": "2026-11-07T18:39:10.334Z",
+        "publishedAt": "2026-11-07T18:39:10.334Z"
+      },
+      "FeedSettings": null,
+      "organization": {
+        "id": null,
+        "documentId": "org-ПАО МТС-Банк",
+        "title": "ПАО МТС-Банк",
+        "createdAt": "2026-11-07T18:39:10.334Z",
+        "updatedAt": "2026-11-07T18:39:10.334Z",
+        "publishedAt": "2026-11-07T18:39:10.334Z"
+      },
+      "workFormats": [
+        {
+          "id": 1,
+          "documentId": "worktype-1",
+          "title": "В офисе",
+          "createdAt": "2026-11-07T18:39:10.334Z",
+          "updatedAt": "2026-11-07T18:39:10.334Z",
+          "publishedAt": "2026-11-07T18:39:10.334Z"
+        }
+      ],
+      "workTypes": [],
+      "workSchedules": [
+        {
+          "id": 0,
+          "documentId": "schedule-0",
+          "title": "Полный день",
+          "createdAt": "2026-11-07T18:39:10.334Z",
+          "updatedAt": "2026-11-07T18:39:10.334Z",
+          "publishedAt": "2026-11-07T18:39:10.334Z"
+        }
+      ],
+      "tasks": [],
+      "offers": [],
+      "requirements": [],
+      "tags": []
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pageSize": 25,
+      "pageCount": 93,
+      "total": 2319
+    }
+  }
+}

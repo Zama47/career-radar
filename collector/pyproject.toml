@@ -10,11 +10,14 @@ requires-python = ">=3.12"
 dependencies = [
     "httpx>=0.28,<0.29",
     "pydantic>=2.9,<3",
+    "selectolax>=0.3,<1",
+    "tenacity>=9.0,<10",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.3,<10",
+    "respx>=0.22,<0.23",
     "ruff>=0.8,<1",
 ]
 
