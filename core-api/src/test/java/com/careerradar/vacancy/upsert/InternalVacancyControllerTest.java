@@ -1,5 +1,6 @@
 package com.careerradar.vacancy.upsert;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,6 +31,35 @@ class InternalVacancyControllerTest extends AbstractIntegrationTest {
               ]
             }
             """;
+
+    @Test
+    void acceptsCollectorFieldAliasesAndClassification() throws Exception {
+        String body = """
+                {"source": "HH", "items": [
+                  {"externalId": "hh-42", "title": "Android-разработчик (стажер)",
+                   "url": "https://hh.ru/vacancy/42", "company": "Romashka",
+                   "remoteType": "HYBRID", "profession": "ANDROID", "seniority": "INTERN"}
+                ]}
+                """;
+
+        mockMvc.perform(post(UPSERT_PATH)
+                        .header(InternalTokenFilter.HEADER, INTERNAL_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.created").value(1));
+
+        var row = jdbcTemplate.queryForMap("""
+                select c.name as company, v.remote_type, v.seniority, p.code as profession
+                from vacancies v
+                left join companies c on c.id = v.company_id
+                left join professions p on p.id = v.profession_id
+                """);
+        assertThat(row.get("company")).isEqualTo("Romashka");
+        assertThat(row.get("remote_type")).isEqualTo("HYBRID");
+        assertThat(row.get("seniority")).isEqualTo("INTERN");
+        assertThat(row.get("profession")).isEqualTo("ANDROID");
+    }
 
     @Test
     void rejectsRequestWithoutToken() throws Exception {

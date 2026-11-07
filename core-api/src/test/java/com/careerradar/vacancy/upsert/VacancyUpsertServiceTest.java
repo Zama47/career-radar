@@ -130,7 +130,9 @@ class VacancyUpsertServiceTest extends AbstractIntegrationTest {
                 Map.of(
                         "token", "super-secret",
                         "nested", Map.of("password", "hunter2", "public", "kept"),
-                        "public", "kept"));
+                        "public", "kept"),
+                null,
+                null);
 
         vacancyUpsertService.upsert(request("HH", draft));
 
@@ -179,6 +181,8 @@ class VacancyUpsertServiceTest extends AbstractIntegrationTest {
                 "Москва",
                 null,
                 Instant.parse("2026-01-01T00:00:00Z"),
-                Map.of());
+                Map.of(),
+                null,
+                null);
     }
 }

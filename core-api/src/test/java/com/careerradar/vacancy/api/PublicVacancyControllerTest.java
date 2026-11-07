@@ -142,6 +142,8 @@ class PublicVacancyControllerTest extends AbstractIntegrationTest {
                 "Москва",
                 null,
                 Instant.parse("2026-01-01T00:00:00Z"),
-                Map.of());
+                Map.of(),
+                null,
+                null);
     }
 }

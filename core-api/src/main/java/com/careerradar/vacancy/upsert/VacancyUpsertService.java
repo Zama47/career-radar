@@ -4,6 +4,8 @@ import com.careerradar.common.error.NotFoundException;
 import com.careerradar.company.Company;
 import com.careerradar.company.CompanyNameNormalizer;
 import com.careerradar.company.CompanyRepository;
+import com.careerradar.profession.Profession;
+import com.careerradar.profession.ProfessionRepository;
 import com.careerradar.source.Source;
 import com.careerradar.source.SourceRepository;
 import com.careerradar.vacancy.ContentHash;
@@ -43,6 +45,7 @@ public class VacancyUpsertService {
 
     private final SourceRepository sourceRepository;
     private final CompanyRepository companyRepository;
+    private final ProfessionRepository professionRepository;
     private final VacancyRepository vacancyRepository;
     private final VacancySourceRepository vacancySourceRepository;
     private final CompanyNameNormalizer companyNameNormalizer;
@@ -52,6 +55,7 @@ public class VacancyUpsertService {
     public VacancyUpsertService(
             SourceRepository sourceRepository,
             CompanyRepository companyRepository,
+            ProfessionRepository professionRepository,
             VacancyRepository vacancyRepository,
             VacancySourceRepository vacancySourceRepository,
             CompanyNameNormalizer companyNameNormalizer,
@@ -59,6 +63,7 @@ public class VacancyUpsertService {
             RawPayloadSanitizer rawPayloadSanitizer) {
         this.sourceRepository = sourceRepository;
         this.companyRepository = companyRepository;
+        this.professionRepository = professionRepository;
         this.vacancyRepository = vacancyRepository;
         this.vacancySourceRepository = vacancySourceRepository;
         this.companyNameNormalizer = companyNameNormalizer;
@@ -154,8 +159,14 @@ public class VacancyUpsertService {
         if (Boolean.TRUE.equals(item.remote())) {
             vacancy.setRemoteType(RemoteType.REMOTE);
         }
+        if (item.remoteType() != null) {
+            vacancy.setRemoteType(item.remoteType());
+        }
         if (item.seniority() != null) {
             vacancy.setSeniority(item.seniority());
+        }
+        if (item.profession() != null && !item.profession().isBlank()) {
+            vacancy.setProfession(resolveProfession(item.profession().trim()));
         }
         if (item.publishedAt() != null) {
             vacancy.setPublishedAt(item.publishedAt());
@@ -183,6 +194,10 @@ public class VacancyUpsertService {
         }
         return cache.computeIfAbsent(normalized, key -> companyRepository.findByNormalizedName(key)
                 .orElseGet(() -> companyRepository.save(new Company(rawName.trim(), key))));
+    }
+
+    private Profession resolveProfession(String code) {
+        return professionRepository.findByCodeIgnoreCase(code).orElse(null);
     }
 
     private void saveLink(Vacancy vacancy, Source source, VacancyDraftRequest item) {

@@ -1,6 +1,8 @@
 package com.careerradar.vacancy.upsert;
 
+import com.careerradar.vacancy.RemoteType;
 import com.careerradar.vacancy.Seniority;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,6 +37,7 @@ public record VacancyDraftRequest(
         String url,
 
         @Schema(example = "ООО «Ромашка»")
+        @JsonAlias("company")
         @Size(max = 255)
         String companyName,
 
@@ -63,7 +66,14 @@ public record VacancyDraftRequest(
         Instant publishedAt,
 
         @Schema(description = "Source payload; credential-like keys are stripped before storage")
-        Map<String, Object> raw) {
+        Map<String, Object> raw,
+
+        @Schema(description = "Work format detected by the collector", example = "REMOTE")
+        RemoteType remoteType,
+
+        @Schema(description = "Profession dictionary code", example = "ANDROID")
+        @Size(max = 64)
+        String profession) {
 
     @AssertTrue(message = "salaryTo must be greater than or equal to salaryFrom")
     @JsonIgnore
