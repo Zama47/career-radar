@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 
 /**
- * Registers the token filter only for {@code /internal/*}. Public endpoints stay open on the
- * MVP; user authentication arrives with the JWT work in a later stage.
+ * Registers the token filter only for {@code /internal/*}. The public API uses JWT instead
+ * (see {@link SecurityConfig}); the two mechanisms never share credentials.
  */
 @Configuration
 @EnableConfigurationProperties(InternalTokenProperties.class)

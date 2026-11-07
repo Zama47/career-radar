@@ -16,7 +16,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * migrations and the datasource wiring are verified, not just the web slice.
  * Skipped automatically when Docker is unavailable.
  */
-@SpringBootTest
+@SpringBootTest(properties = {
+        "security.jwt.secret=test-secret-at-least-32-bytes-long!!",
+        "app.user.email=test@example.com",
+        "app.user.password-hash=$2a$10$lxE89F.XZEUoBzWB7OF0A.qTo.18SMOv7fzbpL0AHXeuOV4te8dJW"
+})
 @Testcontainers(disabledWithoutDocker = true)
 class CareerRadarApplicationTests {
 

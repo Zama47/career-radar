@@ -3,11 +3,10 @@
 Личная операционная система поиска работы: сбор вакансий, аналитика рынка, fit-score резюме,
 application tracker и read-only почта. Один пользователь, без биллинга и мультитенантности.
 
-**Текущий этап — Stage 2 (карьерные сайты компаний):** Python-коллектор собирает вакансии
-и стажировки с карьерных сайтов МТС, Яндекса и VK, нормализует их в `VacancyDraft`
-(грейд, формат работы, профессия) и отправляет батчами в core-api. hh.ru не используется:
-его публичный API закрыт, а обход ограничений запрещён. Аналитика, резюме, LLM, почта и
-остальные источники — в следующих этапах.
+**Текущий этап — Stage 3 (public API + web):** JWT-логин для единственного пользователя,
+поиск и детальные карточки вакансий, dashboard с KPI, страницы `/login`, `/vacancies`,
+`/vacancies/[id]` и `/`. Коллектор этапа 2 наполняет базу, аналитика рынка, резюме, LLM и
+почта — в следующих этапах.
 
 ## Стек и зафиксированные версии
 
@@ -44,6 +43,23 @@ career-radar/
 cp infra/.env.example infra/.env
 # отредактируйте POSTGRES_PASSWORD и INTERNAL_TOKEN
 ```
+
+Для stage 3 добавьте в `infra/.env`:
+
+```bash
+# не короче 32 байт; смена значения разлогинивает все токены
+JWT_SECRET=<openssl rand -base64 48>
+JWT_TTL_SECONDS=3600
+APP_USER_EMAIL=you@example.com
+# BCrypt-хеш пароля (сам пароль в env не хранится):
+#   ./gradlew :core-api:hashPassword
+#   .\gradlew.bat :core-api:hashPassword      # Windows
+APP_USER_PASSWORD_HASH=$2a$10$...
+```
+
+`APP_USER_EMAIL` и `APP_USER_PASSWORD_HASH` — единственный пользователь приложения.
+Пустой/короткий `JWT_SECRET` останавливает core-api при старте (fail fast), а не выдаёт
+подделываемые токены.
 
 `.env` в git не попадает (см. `.gitignore`).
 
@@ -97,10 +113,15 @@ curl -X POST http://localhost:8080/internal/v1/vacancies:upsert \
 Повторный тот же батч даёт `updated`, а тот же контент с другим `externalId` — `skipped`
 (вакансия не дублируется, добавляется связь с источником).
 
-Публичный поиск:
+Публичный поиск (stage 3 требует JWT — см. ниже):
 
 ```bash
-curl "http://localhost:8080/api/v1/vacancies?page=0&size=20&q=kotlin&profession=ANDROID&seniority=JUNIOR&remote=REMOTE"
+TOKEN=$(curl -s -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"..."}' | jq -r .accessToken)
+
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:8080/api/v1/vacancies?page=0&size=20&q=kotlin&profession=ANDROID&seniority=JUNIOR&remote=REMOTE&salaryMin=100000&sort=publishedAt,desc"
 # {"items":[...],"page":0,"size":20,"total":1}
 ```
 
@@ -108,6 +129,41 @@ curl "http://localhost:8080/api/v1/vacancies?page=0&size=20&q=kotlin&profession=
 `V3__seed_dictionaries.sql` (базовые значения) и `V4__source_catalog.sql` (41 карьерный сайт
 из каталога источников этапа 2). Схема этапа — `V2__core_domain.sql`: `V1__baseline.sql`
 остаётся пустым baseline, который уже применён на dev-БД.
+
+### 3b. API этапа 3 — auth, dashboard, детали
+
+Один пользователь из env. JWT HS256, время жизни `JWT_TTL_SECONDS` (по умолчанию 3600 с).
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"..."}'
+# {"accessToken":"eyJ...","expiresIn":3600}
+```
+
+Защищены все `/api/v1/**`, кроме `/api/v1/auth/login` и `/api/v1/ping`. Без токена API
+отвечает `401` в формате RFC 7807 (`application/problem+json`). `/internal/**` по-прежнему
+использует `X-Internal-Token`, а не JWT.
+
+```bash
+# KPI для dashboard
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/v1/dashboard
+# {"totalVacancies":73,"newToday":0,"internships":15,"remoteShare":0.0,...}
+
+# детальная карточка (id из списка)
+curl -H "Authorization: Bearer $TOKEN" \
+  http://localhost:8080/api/v1/vacancies/3f1d9c62-5a0f-4f2c-9d5b-1c7a2b8e4f60
+
+# словарь профессий для фильтра
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/v1/professions
+```
+
+Параметры поиска: `q` (title/company/description), `profession`, `seniority`,
+`remote`, `salaryMin` (совпадение, если `max(salary_to, salary_from) >= salaryMin`),
+`page` (с 0), `size` (1..100), `sort` — `publishedAt,desc` (default), `salaryFrom,desc`,
+`firstSeenAt,desc`. Неизвестный `sort` и отрицательный `salaryMin` дают `400`.
+
+Swagger UI: `http://localhost:8080/swagger-ui.html` — схема `bearerAuth` уже описана.
 
 ### 4. collector
 
@@ -230,7 +286,22 @@ pnpm --dir web install
 pnpm --dir web dev      # http://localhost:3000
 ```
 
-Страница `/` показывает заголовок Career Radar и живой статус core-api.
+Страницы:
+
+- `/login` — форма входа; `POST /api/auth/login` в Next route handler кладёт JWT в
+  **httpOnly** cookie `cr_token`, в клиентский JavaScript токен не попадает.
+- `/` — dashboard: 4 KPI (`totalVacancies`, `newToday`, `internships`, `remoteShare`),
+  две заглушки графиков (Recharts — stage 4) и последние 5 вакансий.
+- `/vacancies` — таблица с фильтрами (поиск, профессия, грейд, формат, зарплата от,
+  сортировка) и пагинацией. Фильтры живут в URL query params.
+- `/vacancies/[id]` — детальная карточка: описание, навыки, источник и ссылка на оригинал.
+
+`lib/api.ts` — единственный клиент core-api: читает cookie на сервере, добавляет
+`Authorization: Bearer`, при `401` делает redirect на `/login`. Ошибки core-api показываются
+карточкой ошибки, пустая выдача — empty state.
+
+`NEXT_PUBLIC_API_URL` задаёт адрес core-api (по умолчанию `http://localhost:8080`);
+это единственная переменная, которая попадает в клиентский бандл, и она не секретная.
 
 ## Проверки (Definition of Done этапа)
 
@@ -250,6 +321,9 @@ pnpm --dir web build
 - `PingControllerTest` проходит; интеграционные тесты с Testcontainers применяют Flyway
   на чистой БД и проверяют `ddl-auto: validate` (нужен Docker; без него тесты этапа 1 падают,
   а `CareerRadarApplicationTests` пропускается);
+- тесты stage 3: `AuthControllerTest` (login ok / wrong password / wrong email / 400),
+  `DashboardControllerTest` (counts, только ACTIVE), `PublicVacancyControllerTest`
+  (401 без токена, фильтры, `salaryMin`, сортировка, detail, 404);
 - тесты collector проходят без сетевых вызовов (httpx `MockTransport`, `respx` для core-api);
 - `next build` завершается успешно.
 
@@ -272,6 +346,15 @@ pnpm --dir web build
 - VK отдаёт 25 SSR-карточек; `--source vk --dry-run` собирает 25 вакансий без капчи.
   Yandex `--dry-run` — 30 вакансий; MTS `--dry-run` — 25.
 
+Этап 3 проверен живым прогоном (core-api + web + dev-БД):
+
+- `POST /api/v1/auth/login` с корректными env-кредами — `200` и JWT; неверный пароль — `401`
+  Problem Details; `GET /api/v1/vacancies` без токена — `401`.
+- `GET /api/v1/dashboard` и `/api/v1/vacancies` с токеном отдают данные stage 2;
+  `GET /api/v1/vacancies/{id}` — карточку с источником; несуществующий id — `404`.
+- В браузере: логин → dashboard (4 KPI + последние вакансии) → `/vacancies` с фильтрами
+  в URL → карточка вакансии → logout очищает cookie и возвращает на `/login`.
+
 ## Docker-образы
 
 Три Dockerfile многостадийные; контекст сборки — корень репозитория для core-api
@@ -292,8 +375,13 @@ docker build -t career-radar-collector ./collector
 ## Безопасность
 
 - Секреты только в `infra/.env`, файл в `.gitignore`; в репозитории есть лишь `.env.example`.
-- `INTERNAL_TOKEN` защищает `/internal/**` (фильтр `InternalTokenFilter`, сравнение в
-  постоянном времени). Если токен не задан, внутренний API отвечает `503`, а не работает открыто.
+- Один пользователь: `APP_USER_EMAIL` + BCrypt-хеш `APP_USER_PASSWORD_HASH`. Пароль в
+  открытом виде не хранится; хеш генерируется `./gradlew :core-api:hashPassword`.
+- JWT (HS256, `JWT_SECRET` ≥ 32 байт) живёт в httpOnly cookie `cr_token` (`SameSite=Lax`,
+  `Secure` в production) и передаётся на сервере как `Authorization: Bearer`. Токен не
+  попадает в клиентский бандл или localStorage.
+- Без токена `/api/v1/**` отвечает `401` Problem Details; `/internal/**` защищён отдельным
+  `INTERNAL_TOKEN` (сравнение в постоянном времени), JWT там не принимается.
 - Collector не пишет в БД и не обходит капчи/авторизацию/ToS; User-Agent честный,
   `robots.txt` проверяется до первого запроса, частота — не более 1 rps на хост.
 

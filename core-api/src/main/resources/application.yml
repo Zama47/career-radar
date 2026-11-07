@@ -31,6 +31,19 @@ internal:
   # Shared secret for /internal/** (collector -> core-api). Empty means "fail closed".
   token: ${INTERNAL_TOKEN:}
 
+security:
+  jwt:
+    # Required: random value of at least 32 bytes. Changing it invalidates every token.
+    secret: ${JWT_SECRET:}
+    ttl-seconds: ${JWT_TTL_SECONDS:3600}
+
+app:
+  user:
+    # Single user of this personal tool. Generate the hash with:
+    #   ./gradlew :core-api:hashPassword
+    email: ${APP_USER_EMAIL:}
+    password-hash: ${APP_USER_PASSWORD_HASH:}
+
 server:
   port: ${CORE_API_PORT:8080}
   shutdown: graceful
