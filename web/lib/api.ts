@@ -3,7 +3,17 @@ import { redirect } from "next/navigation";
 
 import { API_URL, TOKEN_COOKIE } from "@/lib/config";
 import { buildQuery } from "@/lib/query";
-import type { Dashboard, Profession, VacancyDetail, VacancyPage } from "@/lib/types";
+import type {
+  AnalyticsOverview,
+  AnalyticsSkills,
+  AnalyticsTimeline,
+  Dashboard,
+  Profession,
+  SalaryStats,
+  TimelineBucket,
+  VacancyDetail,
+  VacancyPage,
+} from "@/lib/types";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -93,4 +103,36 @@ export function getVacancy(id: string): Promise<VacancyDetail> {
 
 export function getProfessions(): Promise<Profession[]> {
   return apiGet<Profession[]>("/api/v1/professions");
+}
+
+export type AnalyticsQuery = {
+  from?: string;
+  to?: string;
+  profession?: string;
+  seniority?: string;
+  remote?: string;
+};
+
+export function getAnalyticsOverview(
+  filters: AnalyticsQuery & { top?: number },
+): Promise<AnalyticsOverview> {
+  return apiGet<AnalyticsOverview>(`/api/v1/analytics/overview${buildQuery({ ...filters })}`);
+}
+
+export function getAnalyticsTimeline(
+  filters: AnalyticsQuery & { bucket?: TimelineBucket },
+): Promise<AnalyticsTimeline> {
+  return apiGet<AnalyticsTimeline>(`/api/v1/analytics/timeline${buildQuery({ ...filters })}`);
+}
+
+export function getAnalyticsSkills(
+  filters: AnalyticsQuery & { limit?: number },
+): Promise<AnalyticsSkills> {
+  return apiGet<AnalyticsSkills>(`/api/v1/analytics/skills${buildQuery({ ...filters })}`);
+}
+
+export function getAnalyticsSalaries(
+  filters: AnalyticsQuery,
+): Promise<SalaryStats> {
+  return apiGet<SalaryStats>(`/api/v1/analytics/salaries${buildQuery({ ...filters })}`);
 }

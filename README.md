@@ -3,10 +3,10 @@
 Личная операционная система поиска работы: сбор вакансий, аналитика рынка, fit-score резюме,
 application tracker и read-only почта. Один пользователь, без биллинга и мультитенантности.
 
-**Текущий этап — Stage 3 (public API + web):** JWT-логин для единственного пользователя,
-поиск и детальные карточки вакансий, dashboard с KPI, страницы `/login`, `/vacancies`,
-`/vacancies/[id]` и `/`. Коллектор этапа 2 наполняет базу, аналитика рынка, резюме, LLM и
-почта — в следующих этапах.
+**Текущий этап — Stage 4 (аналитика рынка):** KPI с фильтрами, динамика публикаций,
+распределение зарплат, топ навыков и профессий, remote share. API — `/api/v1/analytics/*`,
+web — обновлённый dashboard и страница `/analytics`. Коллектор этапа 2 наполняет базу,
+резюме, LLM и почта — в следующих этапах.
 
 ## Стек и зафиксированные версии
 
@@ -165,6 +165,48 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/v1/professions
 
 Swagger UI: `http://localhost:8080/swagger-ui.html` — схема `bearerAuth` уже описана.
 
+### 3c. API этапа 4 — аналитика рынка
+
+Все эндпоинты требуют JWT. Общие query-параметры: `from`, `to` (ISO-даты, включительно),
+`profession` (код словаря, регистр не важен), `seniority`, `remote`
+(`OFFICE|HYBRID|REMOTE|UNKNOWN`). «Дата рынка» — `coalesce(published_at, first_seen_at)`:
+если источник не отдал дату публикации, используется дата первого обнаружения.
+
+```bash
+# KPI: всего, новых, медиана/p25/p75, remote share, топ профессий и навыков
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:8080/api/v1/analytics/overview?from=2026-10-01&to=2026-10-31&profession=ANDROID&top=5"
+
+# динамика: bucket=day|week|month
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:8080/api/v1/analytics/timeline?from=2026-10-01&to=2026-10-31&bucket=week"
+
+# топ навыков: count и share от числа вакансий выборки
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:8080/api/v1/analytics/skills?profession=ANDROID&limit=20"
+
+# перцентили зарплат
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:8080/api/v1/analytics/salaries?profession=JAVA_BACKEND&seniority=JUNIOR"
+```
+
+Семантика, которую стоит помнить при сверке с SQL:
+
+- `totalVacancies`, `topProfessions`, `topSkills`, timeline и перцентили берут только
+  `status = 'ACTIVE'`; архивные дубликаты не искажают картину.
+- Зарплата считается по `coalesce(salary_from, salary_to)`; `percentile_cont` возвращает
+  `null`, если в выборке нет ни одной вакансии с зарплатой. `currency` — мода валюты
+  выборки (обычно `RUB`).
+- `newVacancies` — вакансии с `first_seen_at` внутри запрошенного периода; если `from`
+  не задан, считаются впервые найденные сегодня (UTC).
+- `share` навыка — доля вакансий выборки, где навык встречается.
+- `top` для overview: 1..20 (по умолчанию 5); `limit` для skills: 1..100 (по умолчанию 20).
+  Некорректные `bucket`, даты (`from > to`), `top`, `limit` и значения enum дают `400`.
+
+Индексы под агрегаты — `V5__analytics_indexes.sql`: частичные индексы по дате рынка и
+зарплате для `ACTIVE`-вакансий плюс `(skill_id, vacancy_id)` для top-skills. Materialized
+views намеренно не добавлены: на текущих объёмах (<100k) они не нужны.
+
 ### 4. collector
 
 ```bash
@@ -290,11 +332,19 @@ pnpm --dir web dev      # http://localhost:3000
 
 - `/login` — форма входа; `POST /api/auth/login` в Next route handler кладёт JWT в
   **httpOnly** cookie `cr_token`, в клиентский JavaScript токен не попадает.
-- `/` — dashboard: 4 KPI (`totalVacancies`, `newToday`, `internships`, `remoteShare`),
-  две заглушки графиков (Recharts — stage 4) и последние 5 вакансий.
+- `/` — dashboard: фильтры (профессия, грейд, формат работы, период 30/90/180/365 дней
+  или «всё время»), 4 KPI (всего, новых, медианная зарплата, remote share), график
+  публикаций по неделям, топ навыков и топ профессий, последние 5 вакансий.
+- `/analytics` — большие графики: недельная динамика, межквартильный диапазон зарплат
+  p25–p75 с медианой, топ-20 навыков, remote share и сравнение профессий. Под каждым
+  графиком — 1–2 вывода «что это значит»; пустая выборка показывает «Нет данных за период».
 - `/vacancies` — таблица с фильтрами (поиск, профессия, грейд, формат, зарплата от,
   сортировка) и пагинацией. Фильтры живут в URL query params.
 - `/vacancies/[id]` — детальная карточка: описание, навыки, источник и ссылка на оригинал.
+
+Графики — Recharts (`lib/chart-theme.ts`, `components/charts/*`), фильтры аналитики —
+`components/analytics-filters.tsx`. Период превращается в `from`/`to` в
+`lib/period.ts`; сами фильтры остаются в URL.
 
 `lib/api.ts` — единственный клиент core-api: читает cookie на сервере, добавляет
 `Authorization: Bearer`, при `401` делает redirect на `/login`. Ошибки core-api показываются
@@ -324,6 +374,9 @@ pnpm --dir web build
 - тесты stage 3: `AuthControllerTest` (login ok / wrong password / wrong email / 400),
   `DashboardControllerTest` (counts, только ACTIVE), `PublicVacancyControllerTest`
   (401 без токена, фильтры, `salaryMin`, сортировка, detail, 404);
+- тесты stage 4: `AnalyticsControllerTest` — overview counts и перцентили, фильтры
+  profession/seniority/remote, `newVacancies` внутри периода, timeline по day/week/month,
+  top skills с `share`, пустая БД, `400` на невалидные `bucket`/даты/`top`/`limit`/enum;
 - тесты collector проходят без сетевых вызовов (httpx `MockTransport`, `respx` для core-api);
 - `next build` завершается успешно.
 
@@ -354,6 +407,24 @@ pnpm --dir web build
   `GET /api/v1/vacancies/{id}` — карточку с источником; несуществующий id — `404`.
 - В браузере: логин → dashboard (4 KPI + последние вакансии) → `/vacancies` с фильтрами
   в URL → карточка вакансии → logout очищает cookie и возвращает на `/login`.
+
+Этап 4 проверен живым прогоном (core-api :8090 + web :3001 + dev-БД, 07.11.2026):
+
+- Flyway применил `V5__analytics_indexes.sql` на dev-БД (`now at version v5`).
+- Seed через `/internal/v1/vacancies:upsert`: `created=4`. Сверка `/analytics/overview`
+  с SQL по тем же фильтрам (`profession=ANDROID`, ноябрь 2026): `total=5`, `median=75000`,
+  `p25=57500`, `p75=97500`, remote `3/5 = 0.6` — значения совпали.
+- `/analytics/salaries` вернул те же перцентили и `sampleSize=4`; `/analytics/timeline`
+  по неделям суммируется в `totalVacancies`.
+- Фильтры меняют данные: `remote=REMOTE` → 3 вакансии и `remoteShare=1.0`;
+  `profession=ML&seniority=INTERN` за 30 дней → пустая выборка и «Нет данных за период».
+- В браузере: логин → dashboard (4 KPI, line-график, top skills/professions, последние
+  вакансии) → `/analytics` (недельная динамика, зарплатный диапазон, remote share,
+  топ-20 навыков, сравнение профессий) → смена фильтров обновляет URL и цифры.
+  Ошибок в консоли нет.
+- Важно: `vacancy_skills` пока наполняется только вручную/тестами — коллектор этапа 2
+  не передаёт навыки. API и график top-skills готовы; на реальных данных график будет
+  пустым, пока не появится классификация навыков (следующий этап).
 
 ## Docker-образы
 

@@ -40,6 +40,11 @@ web (Next.js) ──public API──▶ core-api (Spring Boot) ──▶ Postgre
 4. **LLM path (later):** core-api builds a prompt from stored data → OpenAI-compatible
    provider (OpenCode Go) → structured JSON validated by Bean Validation → `llm_runs`
    audit row. Web only receives the result through the public API.
+5. **Analytics path (stage 4):** browser → Next.js server component with filters from the
+   URL → `lib/api.ts` → `core-api /api/v1/analytics/overview|timeline|skills|salaries` →
+   native aggregate SQL (`percentile_cont`, `date_trunc`, `vacancy_skills` joins) over
+   `ACTIVE` vacancies → JSON → Recharts client components. Filters are applied server-side
+   and are part of the URL, so a chart can be shared or reloaded without client state.
 
 ## Authentication and authorization
 
@@ -94,7 +99,14 @@ All configuration comes from environment variables (see `infra/.env.example`):
   `core-api/src/main/resources/db/migration`. `V1__baseline.sql` establishes the
   history table; `V2__core_domain.sql` adds business tables; `V3__seed_dictionaries.sql`
   seeds professions, skills and pilot sources; `V4__source_catalog.sql` adds the company
-  career-site dictionary used by stage 2.
+  career-site dictionary used by stage 2; `V5__analytics_indexes.sql` adds partial indexes
+  for the stage 4 aggregates.
+- Analytics reads use native SQL on purpose: percentiles (`percentile_cont`), bucketed
+  timelines (`date_trunc`) and skill joins are clearer and faster as one statement than as
+  Criteria/JPA. The "market date" is `coalesce(published_at, first_seen_at)` and salary is
+  `coalesce(salary_from, salary_to)`, so vacancies without a source date or with only an
+  upper salary bound still contribute. No materialized views until the table exceeds
+  roughly 100k active vacancies.
 - Hibernate runs with `ddl-auto: validate`: entities must match migrations, never
   create tables at runtime.
 - Deduplication keys and normalization rules are owned by core-api, so all sources

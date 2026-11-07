@@ -71,6 +71,58 @@ export type Dashboard = {
   topSkills: TopSkill[];
 };
 
+export type AnalyticsTopProfession = {
+  code: string;
+  name: string;
+  count: number;
+};
+
+export type AnalyticsTopSkill = {
+  name: string;
+  count: number;
+};
+
+export type AnalyticsOverview = {
+  totalVacancies: number;
+  newVacancies: number;
+  medianSalary?: number | null;
+  p25Salary?: number | null;
+  p75Salary?: number | null;
+  remoteShare: number;
+  currency?: string | null;
+  topProfessions: AnalyticsTopProfession[];
+  topSkills: AnalyticsTopSkill[];
+};
+
+export type TimelinePoint = {
+  date: string;
+  count: number;
+};
+
+export type AnalyticsTimeline = {
+  points: TimelinePoint[];
+};
+
+export type SkillStat = {
+  skill: string;
+  count: number;
+  share: number;
+};
+
+export type AnalyticsSkills = {
+  items: SkillStat[];
+};
+
+export type SalaryStats = {
+  p25?: number | null;
+  median?: number | null;
+  p75?: number | null;
+  currency?: string | null;
+  sampleSize: number;
+};
+
+export type TimelineBucket = "day" | "week" | "month";
+
 export type Profession = {
   code: string;
   name: string;

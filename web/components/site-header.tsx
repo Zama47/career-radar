@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BriefcaseBusiness, LayoutDashboard, Radar } from "lucide-react";
+import { BriefcaseBusiness, LayoutDashboard, LineChart, Radar } from "lucide-react";
 
 import { LogoutButton } from "@/components/logout-button";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 const links = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/vacancies", label: "Вакансии", icon: BriefcaseBusiness },
+  { href: "/analytics", label: "Аналитика", icon: LineChart },
 ];
 
 export function SiteHeader() {
