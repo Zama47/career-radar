@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import httpx
 import pytest
 
@@ -43,8 +45,41 @@ def test_upsert_sends_internal_token_and_payload() -> None:
 
     assert captured["url"] == "http://localhost:8080/internal/v1/vacancies:upsert"
     assert captured["token"] == "test-token"
-    assert '"external_id":"123"' in str(captured["body"])
+    body = json.loads(str(captured["body"]))
+    assert body["source"] == "HH"
+    assert body["items"][0]["external_id"] == "123"
     assert result.created == 1
+
+
+def test_upsert_groups_drafts_by_source() -> None:
+    requests: list[dict[str, object]] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.read())
+        requests.append(payload)
+        count = len(payload["items"])
+        return httpx.Response(
+            200, json={"received": count, "created": count, "updated": 0, "skipped": 0}
+        )
+
+    def draft(external_id: str, source_code: str) -> VacancyDraft:
+        return VacancyDraft(
+            source_code=source_code,
+            external_id=external_id,
+            title="Python Developer",
+            url=f"https://example.com/{external_id}",
+        )
+
+    with make_client(httpx.MockTransport(handler)) as client:
+        result = client.upsert_vacancies(
+            [draft("1", "hh"), draft("2", "vk"), draft("3", "hh")]
+        )
+
+    assert [payload["source"] for payload in requests] == ["HH", "VK"]
+    assert len(requests[0]["items"]) == 2
+    assert len(requests[1]["items"]) == 1
+    assert result.received == 3
+    assert result.created == 3
 
 
 def test_non_2xx_raises_core_api_error() -> None:

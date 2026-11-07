@@ -45,14 +45,33 @@ class CoreClient:
         return self._request("GET", "/api/v1/ping")
 
     def upsert_vacancies(self, drafts: Iterable[VacancyDraft]) -> UpsertResult:
-        payload = [draft.model_dump(mode="json") for draft in drafts]
-        body = self._request(
-            "POST",
-            "/internal/v1/vacancies:upsert",
-            json=payload,
-            headers={INTERNAL_HEADER: self._config.internal_token},
-        )
-        return UpsertResult.model_validate(body)
+        """Send drafts grouped by source, matching the core-api batch contract.
+
+        The internal endpoint expects ``{"source": "HH", "items": [...]}`` and reports
+        per-batch counters, so a mixed list of drafts is split by ``source_code``.
+        """
+        batches: dict[str, list[VacancyDraft]] = {}
+        for draft in drafts:
+            batches.setdefault(draft.source_code.upper(), []).append(draft)
+
+        received = created = updated = skipped = 0
+        for source_code, batch in batches.items():
+            body = self._request(
+                "POST",
+                "/internal/v1/vacancies:upsert",
+                json={
+                    "source": source_code,
+                    "items": [draft.model_dump(mode="json") for draft in batch],
+                },
+                headers={INTERNAL_HEADER: self._config.internal_token},
+            )
+            result = UpsertResult.model_validate(body)
+            received += result.received or 0
+            created += result.created or 0
+            updated += result.updated or 0
+            skipped += result.skipped or 0
+
+        return UpsertResult(received=received, created=created, updated=updated, skipped=skipped)
 
     def _request(self, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
         try:

@@ -3,9 +3,10 @@
 Личная операционная система поиска работы: сбор вакансий, аналитика рынка, fit-score резюме,
 application tracker и read-only почта. Один пользователь, без биллинга и мультитенантности.
 
-**Текущий этап — Stage 0 (bootstrap):** работающий скелет без бизнес-логики.
-core-api отвечает на health-check, collector умеет вызывать core-api, web показывает статус API,
-PostgreSQL и Redis поднимаются через Docker Compose.
+**Текущий этап — Stage 1 (core domain):** схема БД, словари, дедупликация и приём вакансий
+от collector. core-api принимает батч по внутреннему токену, хранит вакансии, компании,
+источники и связи с источниками, отдаёт публичный список с пагинацией и фильтрами.
+Аналитика, резюме, LLM и почта — в следующих этапах.
 
 ## Стек и зафиксированные версии
 
@@ -75,6 +76,37 @@ curl http://localhost:8080/actuator/health    # {"status":"UP"}
 open http://localhost:8080/swagger-ui.html    # OpenAPI UI
 ```
 
+### 3a. API этапа 1
+
+Внутренний приём вакансий (только collector, заголовок `X-Internal-Token` = `INTERNAL_TOKEN`
+из `infra/.env`):
+
+```bash
+curl -X POST http://localhost:8080/internal/v1/vacancies:upsert \
+  -H "Content-Type: application/json" \
+  -H "X-Internal-Token: $INTERNAL_TOKEN" \
+  -d '{"source":"HH","items":[
+        {"externalId":"1","title":"Android Developer","url":"https://hh.ru/vacancy/1",
+         "companyName":"ООО «Ромашка»","salaryFrom":150000,"salaryTo":220000,
+         "currency":"RUB","remote":true}
+      ]}'
+# {"received":1,"created":1,"updated":0,"skipped":0}
+```
+
+Повторный тот же батч даёт `updated`, а тот же контент с другим `externalId` — `skipped`
+(вакансия не дублируется, добавляется связь с источником).
+
+Публичный поиск:
+
+```bash
+curl "http://localhost:8080/api/v1/vacancies?page=0&size=20&q=kotlin&profession=ANDROID&seniority=JUNIOR&remote=REMOTE"
+# {"items":[...],"page":0,"size":20,"total":1}
+```
+
+Словари (`professions`, `skills`, `sources`) заполняются миграцией `V3__seed_dictionaries.sql`.
+Схема этапа — `V2__core_domain.sql`: `V1__baseline.sql` остаётся пустым baseline, который уже
+применён на dev-БД.
+
 ### 4. collector
 
 ```bash
@@ -110,10 +142,15 @@ pnpm --dir web build
 Ожидаемо:
 
 - контейнеры `career-radar-postgres` и `career-radar-redis` — `healthy`;
-- `PingControllerTest` проходит; интеграционный тест с Testcontainers применяет Flyway
-  (автоматически пропускается, если Docker недоступен);
+- `PingControllerTest` проходит; интеграционные тесты с Testcontainers применяют Flyway
+  на чистой БД и проверяют `ddl-auto: validate` (нужен Docker; без него тесты этапа 1 падают,
+  а `CareerRadarApplicationTests` пропускается);
 - тесты collector проходят без сетевых вызовов (httpx `MockTransport`);
 - `next build` завершается успешно.
+
+Проверено вручную на dev-БД: `created=3`, повторный POST — `updated=3`, дубль по контент-хешу —
+`skipped=1`; `GET /api/v1/vacancies` отдаёт вакансии; `/swagger-ui.html` и `/v3/api-docs` — 200;
+`raw_json` в БД не содержит полей вида `token`/`password`.
 
 ## Docker-образы
 
@@ -135,7 +172,8 @@ docker build -t career-radar-collector ./collector
 ## Безопасность
 
 - Секреты только в `infra/.env`, файл в `.gitignore`; в репозитории есть лишь `.env.example`.
-- `INTERNAL_TOKEN` защищает внутренний collector-эндпоинт (реализация — следующий этап).
+- `INTERNAL_TOKEN` защищает `/internal/**` (фильтр `InternalTokenFilter`, сравнение в
+  постоянном времени). Если токен не задан, внутренний API отвечает `503`, а не работает открыто.
 - Collector не пишет в БД и не обходит капчи/авторизацию/ToS; User-Agent честный.
 
 ## Документация

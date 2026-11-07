@@ -44,11 +44,17 @@ All configuration comes from environment variables (see `infra/.env.example`):
 
 - Schema changes only through Flyway migrations in
   `core-api/src/main/resources/db/migration`. `V1__baseline.sql` establishes the
-  history table; business tables arrive with their stages.
+  history table; `V2__core_domain.sql` adds business tables; `V3__seed_dictionaries.sql`
+  seeds professions, skills and sources.
 - Hibernate runs with `ddl-auto: validate`: entities must match migrations, never
   create tables at runtime.
 - Deduplication keys and normalization rules are owned by core-api, so all sources
-  share one policy.
+  share one policy: `(source_id, external_id)` identifies an occurrence, and a SHA-256
+  content hash over normalized title/company/location/salary prevents cross-source
+  duplicates. List endpoints read `vacancy_sources` for the original URL.
+- Raw collector payloads are stored in `jsonb` only after credential-like keys
+  (`token`, `password`, `secret`, `authorization`, `cookie`, `api_key`, `session`)
+  are stripped.
 
 ## Error handling and observability
 
