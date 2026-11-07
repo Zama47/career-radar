@@ -1,0 +1,407 @@
+{
+  "items": [
+    {
+      "id": "112233445",
+      "premium": false,
+      "name": "Android-разработчик (стажер)",
+      "department": null,
+      "has_test": false,
+      "response_letter_required": false,
+      "area": {
+        "id": "1",
+        "name": "Москва",
+        "url": "https://api.hh.ru/areas/1"
+      },
+      "salary": {
+        "from": 50000,
+        "to": 70000,
+        "currency": "RUR",
+        "gross": false
+      },
+      "type": {
+        "id": "open",
+        "name": "Открытая"
+      },
+      "address": null,
+      "response_url": null,
+      "sort_point_distance": null,
+      "published_at": "2026-11-01T10:00:00+0300",
+      "created_at": "2026-11-01T10:00:00+0300",
+      "archived": false,
+      "apply_alternate_url": "https://hh.ru/applicant/vacancy_response?vacancyId=112233445",
+      "show_logo_in_search": null,
+      "insider_interview": null,
+      "url": "https://api.hh.ru/vacancies/112233445?host=hh.ru",
+      "alternate_url": "https://hh.ru/vacancy/112233445",
+      "relations": [],
+      "employer": {
+        "id": "112",
+        "name": "МТС",
+        "url": "https://api.hh.ru/employers/112",
+        "alternate_url": "https://hh.ru/employer/112",
+        "logo_urls": null,
+        "trusted": true
+      },
+      "snippet": {
+        "requirement": "<highlighttext>Kotlin</highlighttext> и Jetpack Compose, опыт от 6 месяцев. <br> Знание coroutines и Flow.",
+        "responsibility": "Разработка Android-приложения. Полная удалённая работа."
+      },
+      "contacts": null,
+      "schedule": {
+        "id": "remote",
+        "name": "Удаленная работа"
+      },
+      "working_days": [],
+      "working_time_intervals": [],
+      "working_time_modes": [],
+      "accept_temporary": false,
+      "professional_roles": [
+        {
+          "id": "96",
+          "name": "Программист, разработчик"
+        }
+      ],
+      "driver_license_types": [],
+      "accept_incomplete_resumes": false,
+      "experience": {
+        "id": "noExperience",
+        "name": "Нет опыта"
+      },
+      "employment": {
+        "id": "full",
+        "name": "Полная занятость"
+      },
+      "adv_response_url": null,
+      "is_adv_vacancy": false,
+      "adv_context": null
+    },
+    {
+      "id": "223344556",
+      "premium": false,
+      "name": "Java Backend Developer (junior)",
+      "department": null,
+      "has_test": true,
+      "response_letter_required": false,
+      "area": {
+        "id": "2",
+        "name": "Санкт-Петербург",
+        "url": "https://api.hh.ru/areas/2"
+      },
+      "salary": null,
+      "type": {
+        "id": "open",
+        "name": "Открытая"
+      },
+      "address": null,
+      "response_url": null,
+      "sort_point_distance": null,
+      "published_at": "2026-11-02T12:30:00+0300",
+      "created_at": "2026-11-02T12:30:00+0300",
+      "archived": false,
+      "apply_alternate_url": "https://hh.ru/applicant/vacancy_response?vacancyId=223344556",
+      "show_logo_in_search": null,
+      "insider_interview": null,
+      "url": "https://api.hh.ru/vacancies/223344556?host=hh.ru",
+      "alternate_url": "https://hh.ru/vacancy/223344556",
+      "relations": [],
+      "employer": {
+        "id": "223",
+        "name": "Acme",
+        "url": "https://api.hh.ru/employers/223",
+        "alternate_url": "https://hh.ru/employer/223",
+        "logo_urls": null,
+        "trusted": true
+      },
+      "snippet": {
+        "requirement": "Java 21, Spring Boot, PostgreSQL. Английский на уровне чтения документации.",
+        "responsibility": "Разработка внутренних сервисов, код-ревью, участие в планировании."
+      },
+      "contacts": null,
+      "schedule": {
+        "id": "fullDay",
+        "name": "Полный день"
+      },
+      "work_format": [
+        {
+          "id": "ON_SITE",
+          "name": "На месте работодателя"
+        }
+      ],
+      "working_days": [],
+      "working_time_intervals": [],
+      "working_time_modes": [],
+      "accept_temporary": false,
+      "professional_roles": [
+        {
+          "id": "96",
+          "name": "Программист, разработчик"
+        }
+      ],
+      "driver_license_types": [],
+      "accept_incomplete_resumes": false,
+      "experience": {
+        "id": "between1And3",
+        "name": "От 1 года до 3 лет"
+      },
+      "employment": {
+        "id": "full",
+        "name": "Полная занятость"
+      },
+      "adv_response_url": null,
+      "is_adv_vacancy": false,
+      "adv_context": null
+    },
+    {
+      "id": "334455667",
+      "premium": false,
+      "name": "Системный аналитик (middle)",
+      "department": null,
+      "has_test": false,
+      "response_letter_required": false,
+      "area": {
+        "id": "1",
+        "name": "Москва",
+        "url": "https://api.hh.ru/areas/1"
+      },
+      "salary": {
+        "from": 150000,
+        "to": 190000,
+        "currency": "RUR",
+        "gross": true
+      },
+      "type": {
+        "id": "open",
+        "name": "Открытая"
+      },
+      "address": null,
+      "response_url": null,
+      "sort_point_distance": null,
+      "published_at": "2026-11-03T09:15:00+0300",
+      "created_at": "2026-11-03T09:15:00+0300",
+      "archived": false,
+      "apply_alternate_url": "https://hh.ru/applicant/vacancy_response?vacancyId=334455667",
+      "show_logo_in_search": null,
+      "insider_interview": null,
+      "url": "https://api.hh.ru/vacancies/334455667?host=hh.ru",
+      "alternate_url": "https://hh.ru/vacancy/334455667",
+      "relations": [],
+      "employer": {
+        "id": "334",
+        "name": "Ромашка",
+        "url": "https://api.hh.ru/employers/334",
+        "alternate_url": "https://hh.ru/employer/334",
+        "logo_urls": null,
+        "trusted": true
+      },
+      "snippet": {
+        "requirement": "BPMN, UML, описание REST API, опыт работы с требованиями.",
+        "responsibility": "Анализ требований, постановка задач разработке, ведение документации."
+      },
+      "contacts": null,
+      "schedule": {
+        "id": "fullDay",
+        "name": "Полный день"
+      },
+      "work_format": [
+        {
+          "id": "HYBRID",
+          "name": "Гибрид"
+        }
+      ],
+      "working_days": [],
+      "working_time_intervals": [],
+      "working_time_modes": [],
+      "accept_temporary": false,
+      "professional_roles": [
+        {
+          "id": "10",
+          "name": "Аналитик"
+        }
+      ],
+      "driver_license_types": [],
+      "accept_incomplete_resumes": false,
+      "experience": {
+        "id": "between1And3",
+        "name": "От 1 года до 3 лет"
+      },
+      "employment": {
+        "id": "full",
+        "name": "Полная занятость"
+      },
+      "adv_response_url": null,
+      "is_adv_vacancy": false,
+      "adv_context": null
+    },
+    {
+      "id": "445566778",
+      "premium": false,
+      "name": "Data Analyst (senior)",
+      "department": null,
+      "has_test": false,
+      "response_letter_required": false,
+      "area": {
+        "id": "1",
+        "name": "Москва",
+        "url": "https://api.hh.ru/areas/1"
+      },
+      "salary": {
+        "from": 180000,
+        "to": null,
+        "currency": "RUR",
+        "gross": false
+      },
+      "type": {
+        "id": "open",
+        "name": "Открытая"
+      },
+      "address": null,
+      "response_url": null,
+      "sort_point_distance": null,
+      "published_at": "2026-11-04T16:45:00+0300",
+      "created_at": "2026-11-04T16:45:00+0300",
+      "archived": false,
+      "apply_alternate_url": "https://hh.ru/applicant/vacancy_response?vacancyId=445566778",
+      "show_logo_in_search": null,
+      "insider_interview": null,
+      "url": "https://api.hh.ru/vacancies/445566778?host=hh.ru",
+      "alternate_url": "https://hh.ru/vacancy/445566778",
+      "relations": [],
+      "employer": {
+        "id": "445",
+        "name": "Ozon",
+        "url": "https://api.hh.ru/employers/445",
+        "alternate_url": "https://hh.ru/employer/445",
+        "logo_urls": null,
+        "trusted": true
+      },
+      "snippet": {
+        "requirement": "SQL, Python, pandas, опыт построения дашбордов.",
+        "responsibility": "Аналитика продуктовых метрик, подготовка отчётов для команд."
+      },
+      "contacts": null,
+      "schedule": {
+        "id": "remote",
+        "name": "Удаленная работа"
+      },
+      "work_format": [
+        {
+          "id": "REMOTE",
+          "name": "Удалённо"
+        }
+      ],
+      "working_days": [],
+      "working_time_intervals": [],
+      "working_time_modes": [],
+      "accept_temporary": false,
+      "professional_roles": [
+        {
+          "id": "10",
+          "name": "Аналитик"
+        }
+      ],
+      "driver_license_types": [],
+      "accept_incomplete_resumes": false,
+      "experience": {
+        "id": "moreThan6",
+        "name": "Более 6 лет"
+      },
+      "employment": {
+        "id": "full",
+        "name": "Полная занятость"
+      },
+      "adv_response_url": null,
+      "is_adv_vacancy": false,
+      "adv_context": null
+    },
+    {
+      "id": "556677889",
+      "premium": false,
+      "name": "Frontend разработчик (lead)",
+      "department": null,
+      "has_test": false,
+      "response_letter_required": false,
+      "area": {
+        "id": "1",
+        "name": "Москва",
+        "url": "https://api.hh.ru/areas/1"
+      },
+      "salary": {
+        "from": 5000,
+        "to": 8000,
+        "currency": "USD",
+        "gross": true
+      },
+      "type": {
+        "id": "open",
+        "name": "Открытая"
+      },
+      "address": null,
+      "response_url": null,
+      "sort_point_distance": null,
+      "published_at": "2026-11-05T11:00:00+0300",
+      "created_at": "2026-11-05T11:00:00+0300",
+      "archived": false,
+      "apply_alternate_url": "https://hh.ru/applicant/vacancy_response?vacancyId=556677889",
+      "show_logo_in_search": null,
+      "insider_interview": null,
+      "url": "https://api.hh.ru/vacancies/556677889?host=hh.ru",
+      "alternate_url": "https://hh.ru/vacancy/556677889",
+      "relations": [],
+      "employer": {
+        "id": "556",
+        "name": "VK",
+        "url": "https://api.hh.ru/employers/556",
+        "alternate_url": "https://hh.ru/employer/556",
+        "logo_urls": null,
+        "trusted": true
+      },
+      "snippet": {
+        "requirement": "React, TypeScript, опыт leadership и менторства.",
+        "responsibility": "Развитие frontend-платформы, архитектурные решения, менторство команды."
+      },
+      "contacts": null,
+      "schedule": {
+        "id": "fullDay",
+        "name": "Полный день"
+      },
+      "work_format": [
+        {
+          "id": "REMOTE",
+          "name": "Удалённо"
+        }
+      ],
+      "working_days": [],
+      "working_time_intervals": [],
+      "working_time_modes": [],
+      "accept_temporary": false,
+      "professional_roles": [
+        {
+          "id": "96",
+          "name": "Программист, разработчик"
+        }
+      ],
+      "driver_license_types": [],
+      "accept_incomplete_resumes": false,
+      "experience": {
+        "id": "moreThan6",
+        "name": "Более 6 лет"
+      },
+      "employment": {
+        "id": "full",
+        "name": "Полная занятость"
+      },
+      "adv_response_url": null,
+      "is_adv_vacancy": false,
+      "adv_context": null
+    }
+  ],
+  "found": 5,
+  "pages": 1,
+  "per_page": 5,
+  "page": 0,
+  "clusters": null,
+  "arguments": null,
+  "alternate_url": "https://hh.ru/search/vacancy?text=android+%D1%81%D1%82%D0%B0%D0%B6%D0%B5%D1%80",
+  "fixes": null,
+  "suggests": null
+}

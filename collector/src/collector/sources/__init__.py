@@ -1,12 +1,13 @@
-"""Source adapter registry. Adapters are added in later stages."""
+"""Source adapter registry."""
 
 from __future__ import annotations
 
-from collector.sources.base import VacancySource
+from collector.sources.base import SourceAdapter, SourceError
+from collector.sources.hh import HhSource
 
-__all__ = ["VacancySource", "available_sources"]
+__all__ = ["HhSource", "SourceAdapter", "SourceError", "available_sources"]
 
 
-def available_sources() -> dict[str, type[VacancySource]]:
+def available_sources() -> dict[str, type[HhSource]]:
     """Return the registered adapters keyed by source code."""
-    return {}
+    return {HhSource.code: HhSource}

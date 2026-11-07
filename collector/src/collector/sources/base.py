@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Any
+from typing import Protocol, runtime_checkable
 
-from collector.models import VacancyDraft
+from collector.models import RawVacancy, SearchQuery, VacancyDraft
 
 
 class SourceError(RuntimeError):
@@ -15,7 +14,8 @@ class SourceError(RuntimeError):
     """
 
 
-class VacancySource(ABC):
+@runtime_checkable
+class SourceAdapter(Protocol):
     """A source adapter fetches raw listings and maps each one to a normalized draft.
 
     Rules for implementations:
@@ -26,10 +26,8 @@ class VacancySource(ABC):
 
     code: str
 
-    @abstractmethod
-    def fetch(self) -> list[dict[str, Any]]:
+    def fetch(self, query: SearchQuery) -> list[RawVacancy]:
         """Fetch raw listings. Must not write to the database."""
 
-    @abstractmethod
-    def normalize(self, raw: dict[str, Any]) -> VacancyDraft:
+    def normalize(self, raw: RawVacancy) -> VacancyDraft:
         """Map one raw listing to a VacancyDraft accepted by core-api."""
