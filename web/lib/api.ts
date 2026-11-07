@@ -41,7 +41,7 @@ async function authorizedFetch(path: string, init?: RequestInit): Promise<Respon
     );
   }
 
-  if (response.status === 401) redirect("/login");
+  if (response.status === 401) redirect("/api/auth/expired");
 
   if (!response.ok) {
     let detail = `Запрос завершился с кодом ${response.status}`;
