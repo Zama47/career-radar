@@ -62,6 +62,28 @@ class InternalVacancyControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void acceptsRawJsonAliasAndScrubsCredentials() throws Exception {
+        String body = """
+                {"source": "HH", "items": [
+                  {"externalId": "hh-raw-1", "title": "Android Developer",
+                   "url": "https://hh.ru/vacancy/raw-1",
+                   "rawJson": {"token": "super-secret", "public": "kept"}}
+                ]}
+                """;
+
+        mockMvc.perform(post(UPSERT_PATH)
+                        .header(InternalTokenFilter.HEADER, INTERNAL_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.created").value(1));
+
+        String raw = jdbcTemplate.queryForObject(
+                "select raw_json::text from vacancy_sources", String.class);
+        assertThat(raw).contains("kept").doesNotContain("super-secret").doesNotContain("\"token\"");
+    }
+
+    @Test
     void rejectsRequestWithoutToken() throws Exception {
         mockMvc.perform(post(UPSERT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)

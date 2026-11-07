@@ -66,6 +66,7 @@ public record VacancyDraftRequest(
         Instant publishedAt,
 
         @Schema(description = "Source payload; credential-like keys are stripped before storage")
+        @JsonAlias("rawJson")
         Map<String, Object> raw,
 
         @Schema(description = "Work format detected by the collector", example = "REMOTE")
