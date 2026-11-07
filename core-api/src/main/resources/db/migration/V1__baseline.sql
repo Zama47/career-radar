@@ -1,0 +1,2 @@
+-- Baseline migration: establishes the Flyway history table on a clean database.
+-- Business tables are introduced in later stages.

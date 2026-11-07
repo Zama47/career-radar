@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: career-radar-core-api
+  config:
+    # Local development convenience: values from infra/.env are loaded as properties.
+    # Real deployments should provide plain environment variables instead.
+    import:
+      - optional:file:../infra/.env[.properties]
+      - optional:file:./infra/.env[.properties]
+  datasource:
+    url: ${CORE_DB_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:career_radar}}
+    username: ${POSTGRES_USER:career}
+    password: ${POSTGRES_PASSWORD:career}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: ${CORE_API_PORT:8080}
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when-authorized
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    root: INFO
+    com.careerradar: INFO
