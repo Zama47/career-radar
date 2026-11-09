@@ -44,6 +44,30 @@ app:
     email: ${APP_USER_EMAIL:}
     password-hash: ${APP_USER_PASSWORD_HASH:}
 
+career-radar:
+  llm:
+    # OpenAI-compatible base URL, including the version segment (e.g. https://host/v1).
+    base-url: ${OPENCODE_GO_BASE_URL:}
+    api-key: ${OPENCODE_GO_API_KEY:}
+    default-model: ${LLM_DEFAULT_MODEL:deepseek-v4.1-flash}
+    writing-model: ${LLM_WRITING_MODEL:deepseek-v4-pro}
+    classification-model: ${LLM_CLASSIFICATION_MODEL:claude-haiku-5-5}
+    timeout-seconds: ${LLM_TIMEOUT_SECONDS:60}
+    max-retries: ${LLM_MAX_RETRIES:2}
+    cache-ttl-hours: ${LLM_CACHE_TTL_HOURS:168}
+    # Optional per-1M-token prices. OpenCode Go does not publish them, so the default is 0;
+    # token counts and latency are recorded either way.
+    pricing:
+      - model: deepseek-v4.1-flash
+        input-per-million: ${LLM_FLASH_INPUT_PRICE:0}
+        output-per-million: ${LLM_FLASH_OUTPUT_PRICE:0}
+      - model: deepseek-v4-pro
+        input-per-million: ${LLM_PRO_INPUT_PRICE:0}
+        output-per-million: ${LLM_PRO_OUTPUT_PRICE:0}
+  resume-storage:
+    dir: ${RESUME_FILES_DIR:./data/resumes}
+    max-bytes: ${RESUME_MAX_BYTES:10485760}
+
 server:
   port: ${CORE_API_PORT:8080}
   shutdown: graceful

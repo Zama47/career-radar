@@ -59,12 +59,20 @@ public abstract class AbstractIntegrationTest {
         registry.add("security.jwt.secret", () -> JWT_SECRET);
         registry.add("app.user.email", () -> APP_USER_EMAIL);
         registry.add("app.user.password-hash", () -> APP_USER_PASSWORD_HASH);
+        registry.add(
+                "career-radar.resume-storage.dir",
+                () -> java.nio.file.Path.of(
+                                System.getProperty("java.io.tmpdir"), "career-radar-test-resumes")
+                        .toString());
+        registry.add("career-radar.llm.base-url", () -> "");
+        registry.add("career-radar.llm.api-key", () -> "");
     }
 
     @BeforeEach
     void truncateBusinessTables() {
         jdbcTemplate.execute("""
-                truncate table vacancy_skills, vacancy_sources, vacancies, companies, source_runs
+                truncate table llm_cache, llm_runs, resume_variants, resumes,
+                    vacancy_skills, vacancy_sources, vacancies, companies, source_runs
                 restart identity cascade
                 """);
     }

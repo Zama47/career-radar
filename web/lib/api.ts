@@ -9,6 +9,8 @@ import type {
   AnalyticsTimeline,
   Dashboard,
   Profession,
+  ResumeDetail,
+  ResumeSummary,
   SalaryStats,
   TimelineBucket,
   VacancyDetail,
@@ -103,6 +105,14 @@ export function getVacancy(id: string): Promise<VacancyDetail> {
 
 export function getProfessions(): Promise<Profession[]> {
   return apiGet<Profession[]>("/api/v1/professions");
+}
+
+export function getResumes(): Promise<ResumeSummary[]> {
+  return apiGet<ResumeSummary[]>("/api/v1/resumes");
+}
+
+export function getResume(id: string): Promise<ResumeDetail> {
+  return apiGet<ResumeDetail>(`/api/v1/resumes/${encodeURIComponent(id)}`);
 }
 
 export type AnalyticsQuery = {

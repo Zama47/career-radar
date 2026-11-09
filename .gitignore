@@ -40,3 +40,6 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+# Local runtime data (uploaded resume PDFs)
+data/

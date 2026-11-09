@@ -15,6 +15,9 @@ FROM eclipse-temurin:21-jre-alpine AS runtime
 RUN addgroup -S app && adduser -S app -G app
 WORKDIR /app
 COPY --from=build /workspace/core-api/build/libs/*.jar app.jar
+# Resume PDFs are written under /app/data/resumes by default; the runtime user must own it.
+RUN mkdir -p /app/data/resumes && chown -R app:app /app/data
+VOLUME ["/app/data"]
 USER app
 EXPOSE 8080
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar"]

@@ -10,12 +10,13 @@ import {
 } from "lucide-react";
 
 import { ErrorState } from "@/components/states";
+import { FitPanel } from "@/components/fit-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ApiError, getVacancy } from "@/lib/api";
+import { ApiError, getResumes, getVacancy } from "@/lib/api";
 import { formatDate, formatSalary, humanizeCode, remoteLabels, seniorityLabels } from "@/lib/format";
-import type { VacancyDetail } from "@/lib/types";
+import type { ResumeSummary, VacancyDetail } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -25,8 +26,9 @@ export default async function VacancyDetailPage({ params }: { params: Params }) 
   const { id } = await params;
 
   let vacancy: VacancyDetail;
+  let resumes: ResumeSummary[];
   try {
-    vacancy = await getVacancy(id);
+    [vacancy, resumes] = await Promise.all([getVacancy(id), getResumes()]);
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
       notFound();
@@ -133,6 +135,8 @@ export default async function VacancyDetailPage({ params }: { params: Params }) 
           </section>
         </CardContent>
       </Card>
+
+      <FitPanel vacancyId={vacancy.id} resumes={resumes} />
     </main>
   );
 }

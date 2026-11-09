@@ -36,6 +36,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
+    // Stage 5: WireMock backs the HTTP-level test of the OpenAI-compatible LLM client.
+    testImplementation("org.wiremock:wiremock-standalone:3.13.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

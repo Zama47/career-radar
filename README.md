@@ -3,10 +3,11 @@
 Личная операционная система поиска работы: сбор вакансий, аналитика рынка, fit-score резюме,
 application tracker и read-only почта. Один пользователь, без биллинга и мультитенантности.
 
-**Текущий этап — Stage 4 (аналитика рынка):** KPI с фильтрами, динамика публикаций,
-распределение зарплат, топ навыков и профессий, remote share. API — `/api/v1/analytics/*`,
-web — обновлённый dashboard и страница `/analytics`. Коллектор этапа 2 наполняет базу,
-резюме, LLM и почта — в следующих этапах.
+**Текущий этап — Stage 5 (резюме и LLM):** мастер-резюме и варианты, fit-score,
+черновик сопроводительного письма, адаптация резюме под вакансию и журнал `llm_runs`
+с токенами, задержкой и стоимостью. API — `/api/v1/resumes/*` и AI-эндпоинты,
+web — страница `/resume` и панель проверки на карточке вакансии. Почта и
+application tracker — в следующих этапах.
 
 ## Стек и зафиксированные версии
 
@@ -60,6 +61,31 @@ APP_USER_PASSWORD_HASH=$2a$10$...
 `APP_USER_EMAIL` и `APP_USER_PASSWORD_HASH` — единственный пользователь приложения.
 Пустой/короткий `JWT_SECRET` останавливает core-api при старте (fail fast), а не выдаёт
 подделываемые токены.
+
+Для stage 5 добавьте LLM-настройки (OpenCode Go, OpenAI-compatible):
+
+```bash
+# база должна включать версию: клиент вызывает POST {base}/chat/completions
+OPENCODE_GO_BASE_URL=https://your-provider.example/v1
+OPENCODE_GO_API_KEY=...
+LLM_DEFAULT_MODEL=deepseek-v4.1-flash
+LLM_WRITING_MODEL=deepseek-v4-pro
+LLM_TIMEOUT_SECONDS=60
+LLM_MAX_RETRIES=2
+LLM_CACHE_TTL_HOURS=168
+# опционально: USD за 1M токенов; при 0 стоимость в llm_runs будет нулевой,
+# но токены и latency пишутся всегда
+LLM_FLASH_INPUT_PRICE=0
+LLM_FLASH_OUTPUT_PRICE=0
+LLM_PRO_INPUT_PRICE=0
+LLM_PRO_OUTPUT_PRICE=0
+# локальное хранилище PDF (в git не попадает)
+RESUME_FILES_DIR=./data/resumes
+RESUME_MAX_BYTES=10485760
+```
+
+`OPENCODE_GO_*` читает только core-api. В web и collector эти переменные не передаются,
+а ключ никогда не логируется и не возвращается в API-ответах.
 
 `.env` в git не попадает (см. `.gitignore`).
 
@@ -207,6 +233,66 @@ curl -H "Authorization: Bearer $TOKEN" \
 зарплате для `ACTIVE`-вакансий плюс `(skill_id, vacancy_id)` для top-skills. Materialized
 views намеренно не добавлены: на текущих объёмах (<100k) они не нужны.
 
+### 3d. API этапа 5 — резюме и AI-черновики
+
+Все эндпоинты требуют JWT. `resumeId` и `vacancyId` в теле — публичные UUID из API.
+
+```bash
+# создать мастер-резюме; contentJson — любой JSON-объект
+curl -X POST http://localhost:8080/api/v1/resumes \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"title":"Android master","contentJson":{"summary":"Kotlin, Compose"},
+       "contentText":"Kotlin, Compose, Room, проект CoffeeApp","isMaster":true}'
+
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/v1/resumes
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/v1/resumes/{id}
+# PUT — те же поля; если isMaster не передавать, флаг не меняется
+curl -X DELETE -H "Authorization: Bearer $TOKEN" \
+  http://localhost:8080/api/v1/resumes/{id}          # 204
+curl -H "Authorization: Bearer $TOKEN" \
+  http://localhost:8080/api/v1/resumes/{id}/file -o resume.pdf
+```
+
+PDF передаётся в `pdfBase64` (можно с `data:`-префиксом). Файл проверяется по сигнатуре
+`%PDF-`, лимит — `RESUME_MAX_BYTES`, имя генерируется из UUID резюме. `contentText`
+обязателен и не может быть пустым: именно он уходит в LLM.
+
+```bash
+# fit-score
+curl -X POST http://localhost:8080/api/v1/vacancies/{vacancyId}/fit \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"resumeId":"..."}'
+# {"score":78,"verdict":"good_match","strengths":["Kotlin"],"missing":["CI"],
+#  "reasons":["..."],"model":"deepseek-v4.1-flash",
+#  "tokens":{"input":3200,"output":450},"cached":false}
+
+# черновик письма; tone = professional | friendly | concise
+curl -X POST http://localhost:8080/api/v1/vacancies/{vacancyId}/cover-letter \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"resumeId":"...","tone":"professional"}'
+# {"subject":"...","text":"...","model":"deepseek-v4-pro","tokens":{...},"cached":false}
+
+# адаптация резюме; мастер-резюме не перезаписывается
+curl -X POST http://localhost:8080/api/v1/resumes/{resumeId}/tailor \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"vacancyId":"..."}'
+# {"contentJson":{...},"diff":["..."],"warnings":["..."],"model":"...","tokens":{...}}
+```
+
+Семантика AI-слоя:
+
+- Ответы кэшируются на `LLM_CACHE_TTL_HOURS` (по умолчанию 168 ч) по ключу
+  `sha256(task + model + prompt_version + resume_hash + vacancy_hash)`.
+  `"forceRefresh": true` в теле обходит кэш и перезаписывает его.
+- Резюме обрезается до 8k символов, описание вакансии — до 6k; лимиты вывода —
+  800/1200/2000 токенов для fit/письма/tailor.
+- Каждый вызов пишется в `llm_runs`: `task`, `model`, `prompt_version`, `input_tokens`,
+  `output_tokens`, `cost_usd`, `latency_ms`, `status` (`SUCCESS`/`FAILED`) и ошибка.
+  Невалидный JSON от модели даёт `502 Problem Details` и `FAILED`-строку с реальными
+  токенами, поэтому расход остаётся видимым.
+- Пустые `OPENCODE_GO_BASE_URL`/`OPENCODE_GO_API_KEY` дают `503` с понятным `detail`,
+  а не stacktrace. Письма не отправляются: stage 5 создаёт только черновики.
+
 ### 4. collector
 
 ```bash
@@ -341,6 +427,15 @@ pnpm --dir web dev      # http://localhost:3000
 - `/vacancies` — таблица с фильтрами (поиск, профессия, грейд, формат, зарплата от,
   сортировка) и пагинацией. Фильтры живут в URL query params.
 - `/vacancies/[id]` — детальная карточка: описание, навыки, источник и ссылка на оригинал.
+  Ниже — панель «Проверка под вакансию»: выбор резюме, fit-score с цветным badge,
+  сильные и недостающие навыки, черновик письма в модалке («Скопировать», «Сохранить .txt»,
+  «Перегенерировать») и адаптация резюме с diff/warnings.
+- `/resume` — мастер-резюме и варианты: список, редактор `contentText` и `contentJson`,
+  флаг master, загрузка/скачивание PDF. JSON валидируется в браузере до отправки.
+
+Мутации из браузера идут через Next route handlers (`web/app/api/resumes/*`,
+`web/app/api/vacancies/[id]/*`): они читают httpOnly cookie и проксируют запрос в core-api,
+поэтому JWT по-прежнему не попадает в клиентский JavaScript.
 
 Графики — Recharts (`lib/chart-theme.ts`, `components/charts/*`), фильтры аналитики —
 `components/analytics-filters.tsx`. Период превращается в `from`/`to` в
@@ -377,6 +472,12 @@ pnpm --dir web build
 - тесты stage 4: `AnalyticsControllerTest` — overview counts и перцентили, фильтры
   profession/seniority/remote, `newVacancies` внутри периода, timeline по day/week/month,
   top skills с `share`, пустая БД, `400` на невалидные `bucket`/даты/`top`/`limit`/enum;
+- тесты stage 5: `ResumeControllerTest` (CRUD, master-флаг, PDF upload/download, 400/404),
+  `FitScoreServiceTest` (валидный JSON, `FAILED`-запись и 502 на мусор, кэш, forceRefresh,
+  пустой `contentText` без вызова LLM), `CoverLetterServiceTest` (модель/тон/промт,
+  сохранение варианта, запрет пустого резюме), `TailorServiceTest` (draft, обязательный
+  warning, пустой `contentJson` → 502), `OpenAiCompatibleLlmClientTest` (WireMock:
+  usage/model, retry 5xx, отсутствие retry на 4xx, 503 без конфига);
 - тесты collector проходят без сетевых вызовов (httpx `MockTransport`, `respx` для core-api);
 - `next build` завершается успешно.
 
@@ -426,6 +527,28 @@ pnpm --dir web build
   не передаёт навыки. API и график top-skills готовы; на реальных данных график будет
   пустым, пока не появится классификация навыков (следующий этап).
 
+Этап 5 проверен живым прогоном (core-api :8091 + локальный OpenAI-compatible стаб +
+dev-БД, 09.11.2026). Реальный ключ OpenCode Go не использовался, чтобы не тратить токены;
+HTTP-контракт, промпты, парсинг и запись в БД проверены на стабе:
+
+- Flyway применил `V6__resume_llm.sql` на dev-БД (`now at version v6`).
+- `POST /api/v1/resumes` создал мастер-резюме с PDF; `GET` списка/деталей и
+  `GET /{id}/file` вернули данные и `application/pdf`; файл сохранён под именем UUID.
+- `POST /vacancies/{id}/fit` с `forceRefresh` → `score=78`, `verdict=good_match`,
+  `missing=["Coroutines Flow","CI"]`, токены `1234/234`; повторный запрос без флага →
+  `cached=true` и один вызов модели.
+- `POST /cover-letter` → `subject`, текст и `model=deepseek-v4-pro`; повторный запрос →
+  `cached=true`. `POST /tailor` → `diff=2`, `warnings=2` (включая обязательный
+  «проверьте факты»), `contentJson` вернулся, мастер-резюме не изменилось.
+- В БД: `llm_runs` содержит `SUCCESS`-строки с токенами, latency и `cost_usd=0` при
+  нулевых ценах; `resume_variants` — fit/letter/tailor; `llm_cache` — 3 записи с TTL
+  на 7 дней. Тестовые строки после проверки удалены.
+- Next route handlers проверены через реальную cookie-сессию: `POST /api/auth/login` →
+  `POST /api/resumes` (201), `PUT` (200), `DELETE` (204), повторный `GET` (404), а также
+  `fit`/`cover-letter`/`tailor` через прокси — все ответы совпали с прямыми вызовами core-api.
+- Отдельный тест подтверждает: без `OPENCODE_GO_*` AI-эндпоинт отвечает `503`
+  с понятным `detail`, а не `500`.
+
 ## Docker-образы
 
 Три Dockerfile многостадийные; контекст сборки — корень репозитория для core-api
@@ -438,7 +561,10 @@ docker build -t career-radar-collector ./collector
 ```
 
 Все три образа собраны и проверены вручную: web-контейнер отдаёт `/`, core-api-контейнер
-отвечает `{"status":"ok"}` на `/api/v1/ping`, collector печатает версию.
+отвечает `{"status":"ok"}` на `/api/v1/ping`, collector печатает версию. В образе
+core-api каталог `/app/data/resumes` создан и принадлежит runtime-пользователю,
+он объявлен как `VOLUME /app/data` — PDF-резюме переживут пересоздание контейнера
+только при смонтированном volume.
 
 `core-api` и `web` пока не включены в `docker-compose.yml` намеренно: по этапу 0
 достаточно postgres + redis, а приложение запускается локально.
@@ -453,6 +579,9 @@ docker build -t career-radar-collector ./collector
   попадает в клиентский бандл или localStorage.
 - Без токена `/api/v1/**` отвечает `401` Problem Details; `/internal/**` защищён отдельным
   `INTERNAL_TOKEN` (сравнение в постоянном времени), JWT там не принимается.
+- LLM-ключ (`OPENCODE_GO_API_KEY`) читает только core-api; в промпты и `llm_runs` не
+  попадают тела писем, токены и ключи. PDF-резюме лежат в `RESUME_FILES_DIR` (по умолчанию
+  `./data/resumes`), каталог `data/` в `.gitignore`, имя файла генерируется из UUID.
 - Collector не пишет в БД и не обходит капчи/авторизацию/ToS; User-Agent честный,
   `robots.txt` проверяется до первого запроса, частота — не более 1 rps на хост.
 
