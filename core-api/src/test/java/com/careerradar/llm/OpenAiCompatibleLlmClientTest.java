@@ -29,6 +29,7 @@ class OpenAiCompatibleLlmClientTest {
         properties = new LlmProperties();
         properties.setBaseUrl(server.baseUrl());
         properties.setApiKey("test-key");
+        properties.setSessionId("test-session");
         properties.setTimeoutSeconds(5);
         properties.setMaxRetries(0);
     }
@@ -61,6 +62,8 @@ class OpenAiCompatibleLlmClientTest {
 
         server.verify(postRequestedFor(urlEqualTo("/chat/completions"))
                 .withHeader("Authorization", equalTo("Bearer test-key"))
+                .withHeader("User-Agent", equalTo("career-radar/0.1"))
+                .withHeader("x-opencode-session", equalTo("test-session"))
                 .withRequestBody(matchingJsonPath("$.model", equalTo("test-model")))
                 .withRequestBody(matchingJsonPath("$.max_tokens", equalTo("800"))));
     }

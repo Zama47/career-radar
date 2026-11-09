@@ -34,7 +34,7 @@ public class ResumeTailorService {
             Ты — карьерный ассистент Career Radar. Следуй правилам задания, не выдумывай
             опыт и возвращай строго один JSON-объект без markdown.
             """;
-    private static final int MAX_OUTPUT_TOKENS = 2_000;
+    private static final int MAX_OUTPUT_TOKENS = 4_000;
     private static final String DRAFT_WARNING =
             "Черновик: проверьте факты, даты и технологии перед сохранением.";
 

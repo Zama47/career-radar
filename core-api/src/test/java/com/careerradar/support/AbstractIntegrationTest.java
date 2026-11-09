@@ -66,6 +66,8 @@ public abstract class AbstractIntegrationTest {
                         .toString());
         registry.add("career-radar.llm.base-url", () -> "");
         registry.add("career-radar.llm.api-key", () -> "");
+        registry.add("career-radar.llm.default-model", () -> "deepseek-v4.1-flash");
+        registry.add("career-radar.llm.writing-model", () -> "deepseek-v4-pro");
     }
 
     @BeforeEach

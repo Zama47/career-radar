@@ -49,6 +49,8 @@ career-radar:
     # OpenAI-compatible base URL, including the version segment (e.g. https://host/v1).
     base-url: ${OPENCODE_GO_BASE_URL:}
     api-key: ${OPENCODE_GO_API_KEY:}
+    # Stable per-conversation id for OpenCode Go routing and prompt caching.
+    session-id: ${OPENCODE_GO_SESSION_ID:career-radar-local}
     default-model: ${LLM_DEFAULT_MODEL:deepseek-v4.1-flash}
     writing-model: ${LLM_WRITING_MODEL:deepseek-v4-pro}
     classification-model: ${LLM_CLASSIFICATION_MODEL:claude-haiku-5-5}

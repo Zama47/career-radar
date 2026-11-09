@@ -68,7 +68,7 @@ class CoverLetterServiceTest extends AbstractIntegrationTest {
         verify(llmClient).complete(captor.capture());
         LlmRequest request = captor.getValue();
         assertThat(request.model()).isEqualTo("deepseek-v4-pro");
-        assertThat(request.maxOutputTokens()).isEqualTo(1200);
+        assertThat(request.maxOutputTokens()).isEqualTo(3000);
         assertThat(request.userPrompt())
                 .contains("Kotlin, Compose, Room, проект CoffeeApp")
                 .contains("Требуется Kotlin, Compose, CI")

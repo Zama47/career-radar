@@ -30,10 +30,14 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
     private final LlmProperties properties;
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
+    private final String sessionId;
 
     public OpenAiCompatibleLlmClient(LlmProperties properties, ObjectMapper objectMapper) {
         this.properties = properties;
         this.objectMapper = objectMapper;
+        this.sessionId = properties.getSessionId() == null || properties.getSessionId().isBlank()
+                ? java.util.UUID.randomUUID().toString()
+                : properties.getSessionId();
         if (properties.isConfigured()) {
             Duration timeout = Duration.ofSeconds(Math.max(1, properties.getTimeoutSeconds()));
             HttpClient httpClient = HttpClient.newBuilder()
@@ -93,6 +97,8 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
             raw = restClient.post()
                     .uri("/chat/completions")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + properties.getApiKey())
+                    .header(HttpHeaders.USER_AGENT, "career-radar/0.1")
+                    .header("x-opencode-session", sessionId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .body(body)

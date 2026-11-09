@@ -14,6 +14,7 @@ public class LlmProperties {
 
     private String baseUrl = "";
     private String apiKey = "";
+    private String sessionId = "";
     private String defaultModel = "deepseek-v4.1-flash";
     private String writingModel = "deepseek-v4-pro";
     private String classificationModel = "claude-haiku-5-5";
@@ -50,6 +51,14 @@ public class LlmProperties {
 
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 
     public String getDefaultModel() {

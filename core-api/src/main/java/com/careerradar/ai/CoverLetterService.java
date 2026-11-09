@@ -34,7 +34,7 @@ public class CoverLetterService {
             Ты — карьерный ассистент Career Radar. Следуй правилам задания, не выдумывай
             факты и возвращай строго один JSON-объект без markdown.
             """;
-    private static final int MAX_OUTPUT_TOKENS = 1_200;
+    private static final int MAX_OUTPUT_TOKENS = 3_000;
     private static final Map<String, String> TONES = Map.of(
             "professional", "профессиональный, без пафоса",
             "friendly", "дружелюбный, но деловой",

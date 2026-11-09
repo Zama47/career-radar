@@ -66,8 +66,10 @@ APP_USER_PASSWORD_HASH=$2a$10$...
 
 ```bash
 # база должна включать версию: клиент вызывает POST {base}/chat/completions
-OPENCODE_GO_BASE_URL=https://your-provider.example/v1
+# для OpenCode Go: https://opencode.ai/inference/go/openai/v1
+OPENCODE_GO_BASE_URL=https://opencode.ai/inference/go/openai/v1
 OPENCODE_GO_API_KEY=...
+OPENCODE_GO_SESSION_ID=career-radar-local
 LLM_DEFAULT_MODEL=deepseek-v4.1-flash
 LLM_WRITING_MODEL=deepseek-v4-pro
 LLM_TIMEOUT_SECONDS=60
@@ -284,8 +286,9 @@ curl -X POST http://localhost:8080/api/v1/resumes/{resumeId}/tailor \
 - Ответы кэшируются на `LLM_CACHE_TTL_HOURS` (по умолчанию 168 ч) по ключу
   `sha256(task + model + prompt_version + resume_hash + vacancy_hash)`.
   `"forceRefresh": true` в теле обходит кэш и перезаписывает его.
-- Резюме обрезается до 8k символов, описание вакансии — до 6k; лимиты вывода —
-  800/1200/2000 токенов для fit/письма/tailor.
+- Резюме обрезается до 8k символов, описание вакансии — до 6k; лимит `max_tokens` —
+  2000/3000/4000 для fit/письма/tailor. Запас нужен потому, что DeepSeek V4.1 Flash
+  тратит часть бюджета на reasoning, а не только на итоговый JSON.
 - Каждый вызов пишется в `llm_runs`: `task`, `model`, `prompt_version`, `input_tokens`,
   `output_tokens`, `cost_usd`, `latency_ms`, `status` (`SUCCESS`/`FAILED`) и ошибка.
   Невалидный JSON от модели даёт `502 Problem Details` и `FAILED`-строку с реальными

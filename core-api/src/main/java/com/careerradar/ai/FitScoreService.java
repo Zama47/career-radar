@@ -32,7 +32,7 @@ public class FitScoreService {
             Ты — карьерный ассистент Career Radar. Следуй правилам задания, используй только
             факты из резюме и вакансии и возвращай строго один JSON-объект без markdown.
             """;
-    private static final int MAX_OUTPUT_TOKENS = 800;
+    private static final int MAX_OUTPUT_TOKENS = 2_000;
 
     private final ResumeService resumeService;
     private final VacancyRepository vacancyRepository;
