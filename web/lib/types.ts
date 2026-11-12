@@ -132,3 +132,56 @@ export type LoginResponse = {
   accessToken: string;
   expiresIn: number;
 };
+
+export type ResumeSummary = {
+  id: string;
+  title: string;
+  isMaster: boolean;
+  hasPdf: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ResumeDetail = ResumeSummary & {
+  contentJson: Record<string, unknown>;
+  contentText: string;
+};
+
+export type AiTokens = {
+  input: number;
+  output: number;
+};
+
+export type FitVerdict =
+  | "strong_match"
+  | "good_match"
+  | "partial_match"
+  | "weak_match";
+
+export type FitResult = {
+  score: number;
+  verdict: FitVerdict;
+  strengths: string[];
+  missing: string[];
+  reasons: string[];
+  model: string;
+  tokens: AiTokens;
+  cached: boolean;
+};
+
+export type CoverLetterDraft = {
+  subject: string;
+  text: string;
+  model: string;
+  tokens: AiTokens;
+  cached: boolean;
+};
+
+export type TailorDraft = {
+  contentJson: Record<string, unknown>;
+  diff: string[];
+  warnings: string[];
+  model: string;
+  tokens: AiTokens;
+  cached: boolean;
+};

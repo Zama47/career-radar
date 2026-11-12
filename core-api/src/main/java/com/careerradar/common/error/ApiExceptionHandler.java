@@ -1,5 +1,6 @@
 package com.careerradar.common.error;
 
+import com.careerradar.llm.LlmException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -48,6 +49,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     ProblemDetail handleBadCredentials(BadCredentialsException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
         problem.setTitle("Unauthorized");
+        return problem;
+    }
+
+    @ExceptionHandler(LlmException.class)
+    ProblemDetail handleLlm(LlmException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
+        problem.setTitle("AI service error");
         return problem;
     }
 

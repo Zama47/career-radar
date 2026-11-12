@@ -5,7 +5,8 @@ place where LLM and email credentials live.
 
 ```text
 web (Next.js) ──public API──▶ core-api (Spring Boot) ──▶ PostgreSQL 16
-                                   ▲
+                                   ▲        │
+                                   │        └──▶ OpenAI-compatible provider (OpenCode Go)
                                    │ POST /internal/v1/vacancies:upsert
                                    │ X-Internal-Token
                              collector (Python)
@@ -37,9 +38,15 @@ web (Next.js) ──public API──▶ core-api (Spring Boot) ──▶ Postgre
    from the listing text (rule-based, deterministic) and lets core-api own deduplication and
    storage. The collector never opens a database connection and never bypasses a
    403/captcha: it stops and reports the source as failed.
-4. **LLM path (later):** core-api builds a prompt from stored data → OpenAI-compatible
-   provider (OpenCode Go) → structured JSON validated by Bean Validation → `llm_runs`
-   audit row. Web only receives the result through the public API.
+4. **LLM path (stage 5):** browser mutation → Next.js route handler (reads the httpOnly
+   cookie) → `core-api /api/v1/vacancies/{id}/fit|cover-letter` or
+   `/api/v1/resumes/{id}/tailor` → prompt assembled from the stored resume and vacancy
+   (truncated to 8k/6k chars) → OpenAI-compatible `POST /chat/completions` with retries on
+   429/5xx/timeouts → JSON parsed and schema-checked → `llm_runs` audit row (tokens, latency,
+   cost, status) → `resume_variants` draft. Successful structured answers are cached for
+   `LLM_CACHE_TTL_HOURS` (7 days) by a hash of task/model/prompt version/inputs; the UI can
+   bypass the cache with `forceRefresh`. Nothing is sent by email and the master resume is
+   never overwritten. Web only receives drafts through the public API.
 5. **Analytics path (stage 4):** browser → Next.js server component with filters from the
    URL → `lib/api.ts` → `core-api /api/v1/analytics/overview|timeline|skills|salaries` →
    native aggregate SQL (`percentile_cont`, `date_trunc`, `vacancy_skills` joins) over
@@ -88,7 +95,10 @@ Rules every adapter follows:
 All configuration comes from environment variables (see `infra/.env.example`):
 `POSTGRES_*`, `CORE_API_PORT`, `INTERNAL_TOKEN`, `JWT_SECRET`, `JWT_TTL_SECONDS`,
 `APP_USER_EMAIL`, `APP_USER_PASSWORD_HASH`, `OPENCODE_GO_BASE_URL`,
-`OPENCODE_GO_API_KEY`, `COLLECTOR_USER_AGENT`. The collector also reads `CORE_API_URL`,
+`OPENCODE_GO_API_KEY`, `OPENCODE_GO_SESSION_ID`, `LLM_DEFAULT_MODEL`, `LLM_WRITING_MODEL`,
+`LLM_CLASSIFICATION_MODEL`, `LLM_TIMEOUT_SECONDS`, `LLM_MAX_RETRIES`,
+`LLM_CACHE_TTL_HOURS`, optional `LLM_*_PRICE`, `RESUME_FILES_DIR`, `RESUME_MAX_BYTES`,
+`COLLECTOR_USER_AGENT`. The collector also reads `CORE_API_URL`,
 `MTS_BASE_URL`, `YANDEX_BASE_URL`, `VK_BASE_URL`, `REQUEST_TIMEOUT`,
 `RATE_LIMIT_SECONDS`; the legacy hh.ru adapter additionally reads `HH_BASE_URL`,
 `HH_AREA`, `HH_PER_PAGE`, `HH_ACCESS_TOKEN` (optional). Web reads `NEXT_PUBLIC_API_URL`.
@@ -100,7 +110,8 @@ All configuration comes from environment variables (see `infra/.env.example`):
   history table; `V2__core_domain.sql` adds business tables; `V3__seed_dictionaries.sql`
   seeds professions, skills and pilot sources; `V4__source_catalog.sql` adds the company
   career-site dictionary used by stage 2; `V5__analytics_indexes.sql` adds partial indexes
-  for the stage 4 aggregates.
+  for the stage 4 aggregates; `V6__resume_llm.sql` adds `resumes`, `resume_variants`,
+  `llm_runs` and the TTL `llm_cache`.
 - Analytics reads use native SQL on purpose: percentiles (`percentile_cont`), bucketed
   timelines (`date_trunc`) and skill joins are clearer and faster as one statement than as
   Criteria/JPA. The "market date" is `coalesce(published_at, first_seen_at)` and salary is
@@ -123,4 +134,7 @@ All configuration comes from environment variables (see `infra/.env.example`):
   and `400` for unsupported query values.
 - `/actuator/health` exposes liveness/readiness probes and database health.
 - Source failures are logged and reported through `source_runs` (later stage).
-- Logs must not contain email bodies, tokens, or full résumé text.
+- LLM spend is auditable through `llm_runs`; malformed model output is stored as `FAILED`
+  with the real token counts, while the API returns a `502` Problem Details. Missing LLM
+  configuration returns `503`.
+- Logs must not contain email bodies, tokens, API keys, full résumé text or raw prompts.
